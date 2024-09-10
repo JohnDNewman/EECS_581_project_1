@@ -1,0 +1,9 @@
+2 hours planning x5: this was as long as it took, documentation was started late
+30? min for ship class: simple class, shouldn't be much more than realearning python classes, clarifying constructor
+45? min for player class: more complex than ship but still relatively straightforward.
+45? min for battleship class: same concept as player.
+1:30 for pygame loop?x2: lack of experience means this should take longer than a simple class.
+1 hour trouble shootingx5: probably lowballing the number but it will mix with finishing touches anyways
+2 hours finishing touchesx5: Sure to be a slog of oh what if we ... and then ... and then it will be good. Progress slows as it reaches completion
+2 hours documenting: Little 15 minute documentation trips will add up in the end.
+32 person-hours on project: Combination of times listed above.
