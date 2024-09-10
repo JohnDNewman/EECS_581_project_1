@@ -1,10 +1,10 @@
 class Ship:
-    def __init__(self, size: int):
+    def __init__(self, coords: list[tuple]):
         #create coords object based on size of ship
-        self.coords = ["?"]
+        self.coords = coords
         #create _hitFlag and populate list based on size of ship
         self._hitFlag = []
-        for _ in range(size):
+        for _ in range(len(self.coords)):
             self._hitFlag.append(False) #append a new flag for each space the ship would take
     
     #function to check if the ship is hit at coords coordinates.
