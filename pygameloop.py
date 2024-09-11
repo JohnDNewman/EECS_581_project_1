@@ -1,6 +1,7 @@
 import pygame as pg
 import os
 from battleship import Battleship
+from test import Test
 from ship import Ship
 
 
@@ -118,27 +119,30 @@ class PyGameLoop:
         return ((x, y))
 
 
+# Modified below section a bit. Checking if event.key is the right key instead of event.type
+
     def _createShips(self, p0Ships, p1Ships):                               # creates ship list based on number of ships
         for event in pg.event.get():                                            # waits for keyboard event
-            if (event.type in [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5]):            # always adds one ship
-                p0Ships.append([(0, 0)])                                                # positions ship in 0th column
-                p1Ships.append([(0, 0)])                                                # positions ship in 0th column
+            if event.type ==pg.KEYDOWN:
+                if (event.key in [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5]):            # always adds one ship
+                    p0Ships.append([(0, 0)])                                                # positions ship in 0th column
+                    p1Ships.append([(0, 0)])                                                # positions ship in 0th column
 
-            if (event.type in [pg.K_2, pg.K_3, pg.K_4, pg.K_5]):                    # adds second ship if at least 2
-                p0Ships.append([(1, 0), (1, 1)])                                        # positions ship in 0th column
-                p1Ships.append([(1, 0), (1, 1)])                                        # positions ship in 0th column
+                if (event.key in [pg.K_2, pg.K_3, pg.K_4, pg.K_5]):                    # adds second ship if at least 2
+                    p0Ships.append([(1, 0), (1, 1)])                                        # positions ship in 0th column
+                    p1Ships.append([(1, 0), (1, 1)])                                        # positions ship in 0th column
 
-            if (event.type in [pg.K_3, pg.K_4, pg.K_5]):                            # adds third ship if at least 3
-                p0Ships.append([(2, 0), (2, 1), (2, 2)])                                # positions ship in 0th column
-                p1Ships.append([(2, 0), (2, 1), (2, 2)])                                # positions ship in 0th column
+                if (event.key in [pg.K_3, pg.K_4, pg.K_5]):                            # adds third ship if at least 3
+                    p0Ships.append([(2, 0), (2, 1), (2, 2)])                                # positions ship in 0th column
+                    p1Ships.append([(2, 0), (2, 1), (2, 2)])                                # positions ship in 0th column
 
-            if (event.type in [pg.K_4, pg.K_5]):                                    # adds fourth ship if at least 4
-                p0Ships.append([(3, 0), (3, 1), (3, 2), (3, 3)])                        # positions ship in 0th column
-                p1Ships.append([(3, 0), (3, 1), (3, 2), (3, 3)])                        # positions ship in 0th column
+                if (event.key in [pg.K_4, pg.K_5]):                                    # adds fourth ship if at least 4
+                    p0Ships.append([(3, 0), (3, 1), (3, 2), (3, 3)])                        # positions ship in 0th column
+                    p1Ships.append([(3, 0), (3, 1), (3, 2), (3, 3)])                        # positions ship in 0th column
 
-            if (event.type in [pg.K_5]):                                            # adds fifth ship if it is 5
-                p0Ships.append([(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)])                # positions ship in 0th column
-                p1Ships.append([(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)])                # positions ship in 0th column
+                if (event.key in [pg.K_5]):                                            # adds fifth ship if it is 5
+                    p0Ships.append([(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)])                # positions ship in 0th column
+                    p1Ships.append([(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)])                # positions ship in 0th column
 
 
     def _drawShips(self, player=None):                                      # draws a player's ships
@@ -207,6 +211,16 @@ class PyGameLoop:
                             self._screen.blit(hitShot, self._coordsToPix(0, (i, j)))                # draws hit shot
                         case 3:                                                                 # matches a sunk shot value PLACEHOLDER NUMBER
                             self._screen.blit(sunkShot, self._coordsToPix(0, (i, j)))               # draws sunk shot
+
+    def _placeShips(self):
+        # 1056? is starting position. Highlight starting position
+        # Width of a square on the board is 102
+
+        highlightedSquare = (0,0)
+
+        rect = pg.Rect(1056,0,102,102)
+
+
 
 
     def run(self):
@@ -278,6 +292,7 @@ class PyGameLoop:
                     self._screen.blit(background, (0, 0))                   # displays game background containing both boards
                     self._drawShips(0)                                      # draws PlayerZero ships
                     pg.display.flip()                                       # updates the game window
+                    self._placeShips(0)
                     # logic for actual ship placement needs to go here
 
                 if (passingScreen):                                     # checks if passingScreen needs to display
@@ -292,6 +307,7 @@ class PyGameLoop:
                     self._screen.blit(background, (0, 0))                   # displays game background containing both boards
                     self._drawShips(1)                                      # draws PlayerZero ships
                     pg.display.flip()                                       # updates the game window
+                    self._placeShips(1)
                     # logic for actual ship placement needs to go here
 
                 if (passingScreen):                                     # checks if passingScreen needs to display
