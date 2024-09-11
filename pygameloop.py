@@ -217,8 +217,26 @@ class PyGameLoop:
         # Width of a square on the board is 102
 
         highlightedSquare = (0,0)
+        allPlaced = False
 
         rect = pg.Rect(1056,0,102,102)
+        
+        while not allPlaced:
+            pg.draw.rect(self._screen, 'red', rect)
+            pg.display.update()
+
+            events = pg.event.get()
+
+            for event in events:
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_RIGHT:
+                        rect.move_ip(100,0)
+                    elif event.key == pg.K_LEFT:
+                    
+                    elif event.key == pg.K_DOWN:
+
+                    elif event.key == pg.K_UP:
+
 
 
 
