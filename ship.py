@@ -16,9 +16,18 @@ class Ship:
                 return True #return bool true to indicate this ship was hit.
         return False #if no section is hit, return false.
     
+    #funtion to check if ship has been sunk
     def isSunk(self):
-        sunk = True
-        for section in self._hitFlag:
-            if section == False:
-                return False
-        return sunk
+        sunk = True #assume it is sunk
+        for section in self._hitFlag: #iterate through ships hit flags
+            if section == False: #if some flag isn't true, hasnt been hit
+                return False #Ship isn't sunk, return False
+        return sunk #no safe section indicates ship is sunk.
+    
+    #helper function to determine number of times a ship has been hit
+    def numHits(self):
+        numhits = 0 #assume 0 hits
+        for section in self._hitFlag: #check each hit flag
+            if section == True: #if hit then
+                numhits += 1 #add 1 to number of hits
+        return numhits #once done iterating then return number of hits
