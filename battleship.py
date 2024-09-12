@@ -1,7 +1,7 @@
 from board import Board
 
 class Battleship:                                           #
-    def __init__(self, Board, shipList1, shipList2):        # Init class with board along with where all ships are
+    def __init__(self, shipList1, shipList2):        # Init class with board along with where all ships are
           self.boardZero = Board(shipList1)                 # Positions of all ships for player 1
           self.boardOne = Board(shipList2)                  # Positions of all ships for player 2
           
