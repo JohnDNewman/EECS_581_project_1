@@ -7,4 +7,5 @@
 2 hours finishing touchesx5: Sure to be a slog of oh what if we ... and then ... and then it will be good. Progress slows as it reaches completion
 2 hours documenting: Little 15 minute documentation trips will add up in the end.
 30 minutes board.py constructor + allSunk method
+1 hour board.py shoot, wasShot, isSunk, setBoard, _placeShip methods
 32 person-hours on project: Combination of times listed above.
