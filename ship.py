@@ -2,6 +2,8 @@ class Ship:
     def __init__(self, coords: list[tuple]):
         #create coords object based on size of ship
         self.coords = coords
+        #create a private size attribute for convenience/debugging
+        self._size = len(self.coords)
         #create _hitFlag and populate list based on size of ship
         self._hitFlag = []
         for _ in range(len(self.coords)):
@@ -31,3 +33,7 @@ class Ship:
             if section == True: #if hit then
                 numhits += 1 #add 1 to number of hits
         return numhits #once done iterating then return number of hits
+    
+    #create function to return size of ship
+    def get_length(self):
+        return self._size
