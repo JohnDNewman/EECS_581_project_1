@@ -3,6 +3,7 @@
 - Game class, turn number, turn checking, win checking
   - Board/player class, each player interacts with a separate instance, makes moves, checks hits
     - Ship class with list containing cells alive and another list with boolean values and matching indices denoting hit cells
+![alt text](https://github.com/JohnDNewman/EECS_581_project_1/blob/main/assets/overview.png?raw=true)
 ### Ship: 
 - Construct with coord list of tuples of (0,0) based on size of ship
 - _hitFlag list of boolean values with corresponding indices to coord list
