@@ -11,12 +11,13 @@ class PyGameLoop:
         Each board is 1004x1004 and displayed side by side
         10x10 pixels for each box with a 2 pixel outside border
         50 pixel gap between them when displayed
+        100 pixel gap on the left and top to show labels
         Left board is where the player shoots
         Right board is where the player places their ships
         '''
         singleBoardWidth  = 1004
-        self._width       = 2 * singleBoardWidth + 50
-        self._height      = 1004
+        self._width       = 2 * singleBoardWidth + 50 + 100
+        self._height      = 1004 + 100
 
         self._battleship  = Battleship()
         self._screen      = pg.display.set_mode((self._width, self._height))     # initializes the window
@@ -26,47 +27,47 @@ class PyGameLoop:
     def _coordsToPix(boardNum, coords):                                     # takes in 0 or 1 to indicate board to draw on and takes coords to returns pixels on given board
         match coords[0]:
             case 0:
-                y = 2
-            case 1:
                 y = 102
-            case 2:
+            case 1:
                 y = 202
-            case 3:
+            case 2:
                 y = 302
-            case 4:
+            case 3:
                 y = 402
-            case 5:
+            case 4:
                 y = 502
-            case 6:
+            case 5:
                 y = 602
-            case 7:
+            case 6:
                 y = 702
-            case 8:
+            case 7:
                 y = 802
-            case 9:
+            case 8:
                 y = 902
+            case 9:
+                y = 1002
 
         match coords[1]:
             case 0:
-                x = 2
-            case 1:
                 x = 102
-            case 2:
+            case 1:
                 x = 202
-            case 3:
+            case 2:
                 x = 302
-            case 4:
+            case 3:
                 x = 402
-            case 5:
+            case 4:
                 x = 502
-            case 6:
+            case 5:
                 x = 602
-            case 7:
+            case 6:
                 x = 702
-            case 8:
+            case 7:
                 x = 802
-            case 9:
+            case 8:
                 x = 902
+            case 9:
+                x = 1002
 
         return ((x + (boardNum * 1054), y))                                     # if boardNum is 0, it's left board and won't shift, if 1, it'll add on the constant x value of the left board to shift
     
@@ -74,46 +75,46 @@ class PyGameLoop:
     def _pixToCoords(pix):                                                  # takes in pixels and returns coordinate values SHOULD ONLY BE NEEDED FOR LEFT BOARD AND NOT RIGHT BOARD
         x, y = -1, -1                                                           # initializes as -1 in case no coordinates are matched
         
-        if (pix[0] < 102):
+        if (pix[0] < 202):
             y = 0
-        elif (pix[0] < 202):
-            y = 1
         elif (pix[0] < 302):
-            y = 2
+            y = 1
         elif (pix[0] < 402):
-            y = 3
+            y = 2
         elif (pix[0] < 502):
-            y = 4
+            y = 3
         elif (pix[0] < 602):
-            y = 5
+            y = 4
         elif (pix[0] < 702):
-            y = 6
+            y = 5
         elif (pix[0] < 802):
-            y = 7
+            y = 6
         elif (pix[0] < 902):
+            y = 7
+        elif (pix[0] < 1002):
             y = 8
-        elif (pix[0] < 1004):
+        elif (pix[0] < 1104):
             y = 9
 
-        if (pix[0] < 102):
+        if (pix[0] < 202):
             x = 0
-        elif (pix[0] < 202):
-            x = 1
         elif (pix[0] < 302):
-            x = 2
+            x = 1
         elif (pix[0] < 402):
-            x = 3
+            x = 2
         elif (pix[0] < 502):
-            x = 4
+            x = 3
         elif (pix[0] < 602):
-            x = 5
+            x = 4
         elif (pix[0] < 702):
-            x = 6
+            x = 5
         elif (pix[0] < 802):
-            x = 7
+            x = 6
         elif (pix[0] < 902):
+            x = 7
+        elif (pix[0] < 1002):
             x = 8
-        elif (pix[0] < 1004):
+        elif (pix[0] < 1104):
             x = 9
 
         return ((x, y))
@@ -123,7 +124,7 @@ class PyGameLoop:
 
     def _createShips(self, p0Ships, p1Ships):                               # creates ship list based on number of ships
         for event in pg.event.get():                                            # waits for keyboard event
-            if event.type ==pg.KEYDOWN:
+            if (event.type == pg.KEYDOWN):
                 if (event.key in [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5]):            # always adds one ship
                     p0Ships.append([(0, 0)])                                                # positions ship in 0th column
                     p1Ships.append([(0, 0)])                                                # positions ship in 0th column
@@ -149,26 +150,26 @@ class PyGameLoop:
         if (player is None):                                                    # runs if nothing passed in
             player = self._battleship.turn                                          # defaults to whose turn it is
 
-        shipImgs = [[pg.image.load(os.path.join('assets', 'redShip1.jpg')),     # loads all ship images
-                     pg.image.load(os.path.join('assets', 'redShip2.jpg')),
-                     pg.image.load(os.path.join('assets', 'redShip3.jpg')),
-                     pg.image.load(os.path.join('assets', 'redShip4.jpg')),
-                     pg.image.load(os.path.join('assets', 'redShip5.jpg'))],
+        shipImgs = [[pg.image.load(os.path.join('assets', 'RedShip1.png')),     # loads all ship images
+                     pg.image.load(os.path.join('assets', 'RedShip2.png')),
+                     pg.image.load(os.path.join('assets', 'RedShip3.png')),
+                     pg.image.load(os.path.join('assets', 'RedShip4.png')),
+                     pg.image.load(os.path.join('assets', 'RedShip5.png'))],
 
-                    [pg.image.load(os.path.join('assets', 'blueShip1.jpg')),
-                     pg.image.load(os.path.join('assets', 'blueShip2.jpg')),
-                     pg.image.load(os.path.join('assets', 'blueShip3.jpg')),
-                     pg.image.load(os.path.join('assets', 'blueShip4.jpg')),
-                     pg.image.load(os.path.join('assets', 'blueShip5.jpg'))]]
+                    [pg.image.load(os.path.join('assets', 'GreenShip1.png')),
+                     pg.image.load(os.path.join('assets', 'GreenShip2.png')),
+                     pg.image.load(os.path.join('assets', 'GreenShip3.png')),
+                     pg.image.load(os.path.join('assets', 'GreenShip4.png')),
+                     pg.image.load(os.path.join('assets', 'GreenShip5.png'))]]
         
         for shipLen in range(len(self._placedShips[player])):                   # iterates through the placed ships
             self._screen.blit(shipImgs[player][shipLen], self._coordsToPix(1, self._placedShips[player][shipLen][0])) # draws ship on board (ISSUE WITH VERTICAL/HORIZONTAL DECISION AND COORD TO PIX CONVERSION ON DIFFERENT BOARDS)
 
 
     def _drawShots(self):                                                   # draws all the shots taken in the game on the correct side
-        missedShot = pg.image.load(os.path.join('assets', 'MissedShot.jpg'))
-        hitShot    = pg.image.load(os.path.join('assets', 'HitShot.jpg'))
-        sunkShot   = pg.image.load(os.path.join('assets', 'SunkShot.jpg'))
+        missedShot = pg.image.load(os.path.join('assets', 'MissedShot.png'))
+        hitShot    = pg.image.load(os.path.join('assets', 'HitShot.png'))
+        sunkShot   = pg.image.load(os.path.join('assets', 'SunkShot.png'))
 
         if (self._battleship.turn == 0):                                        # runs if current turn is PlayerZero
             for i in range(len(self._battleship.boardZero.board)):                  # iterates through current player's board rows
@@ -253,7 +254,7 @@ class PyGameLoop:
         #font          = pg.font.SysFont('Arial', 40)            # sets font for text within window (COMMENTED OUT FOR NOW, THINGS NEED TO BE INSTALLED FOR THE FONT)
 
         welcomeScreen = pg.image.load(os.path.join('assets', 'WelcomeScreen.jpg'))      # PHOTO NOT YET ADDED
-        background    = pg.image.load(os.path.join('assets', 'Background.jpg'))         # PHOTO NOT YET ADDED
+        background    = pg.image.load(os.path.join('assets', 'LabeledBackground.png'))  # PHOTO HAS BEEN UPDATED WITH LABELS AND NEW SIZE
         passToP0      = pg.image.load(os.path.join('assets', 'PassToP0.jpg'))           # PHOTO NOT YET ADDED
         passToP1      = pg.image.load(os.path.join('assets', 'PassToP1.jpg'))           # PHOTO NOT YET ADDED
         winScreen     = [pg.image.load(os.path.join('assets', 'RedWinScreen.jpg')),     # PHOTO NOT YET ADDED
