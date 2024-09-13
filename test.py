@@ -71,7 +71,6 @@ place_err_ship = font.render("Ship would intersect Ship", True, (0,0,0)) #Tell p
 place_err_ship_flag = False # a flag to use to display the ship place error.
 
 placed = font.render("All Ships Have been Placed!", True, (0,0,0)) #Indicate ships have been placed
-exit = False #unused LANDON WHAT IS THIS FOR
 
 shipSizes = [1,2,3,4,5]
 currentShip = 0
