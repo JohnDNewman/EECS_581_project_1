@@ -26,8 +26,11 @@ class Ship:
         #for the number of elements in self coords list
         for i in range(len(self.coords)):
             if coords == self.coords[i]: #check if each element is the same as the target coords
-                self._hitFlag[i] = True #if hit, change hit flag for that ship section to True
-                return True #return bool true to indicate this ship was hit.
+                if (self._hitFlag[i] == False): # check if coordinate has already been shot
+                    self._hitFlag[i] = True #if hit, change hit flag for that ship section to True
+                    return True #return bool true to indicate this ship was hit.
+                else:
+                    return False # if section has previously already been hit, return False
         return False #if no section is hit, return false.
     
     #funtion to check if ship has been sunk

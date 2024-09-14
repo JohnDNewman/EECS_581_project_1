@@ -176,30 +176,30 @@ class PyGameLoop:
         return ((x, y))
 
 
-# Modified below section a bit. Checking if event.key is the right key instead of event.type
+# # Modified below section a bit. Checking if event.key is the right key instead of event.type
 
-    def _createShips(self, p0Ships, p1Ships):                               # creates ship list based on number of ships
-        for event in pg.event.get():                                            # waits for keyboard event
-            if (event.type == pg.KEYDOWN):
-                if (event.key in [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5]):            # always adds one ship
-                    p0Ships.append([(0, 0)])                                                # positions ship in 0th column
-                    p1Ships.append([(0, 0)])                                                # positions ship in 0th column
+#     def _createShips(self, p0Ships, p1Ships):                               # creates ship list based on number of ships
+#         for event in pg.event.get():                                            # waits for keyboard event
+#             if (event.type == pg.KEYDOWN):
+#                 if (event.key in [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5]):            # always adds one ship
+#                     p0Ships.append([(0, 0)])                                                # positions ship in 0th column
+#                     p1Ships.append([(0, 0)])                                                # positions ship in 0th column
 
-                if (event.key in [pg.K_2, pg.K_3, pg.K_4, pg.K_5]):                    # adds second ship if at least 2
-                    p0Ships.append([(1, 0), (1, 1)])                                        # positions ship in 0th column
-                    p1Ships.append([(1, 0), (1, 1)])                                        # positions ship in 0th column
+#                 if (event.key in [pg.K_2, pg.K_3, pg.K_4, pg.K_5]):                    # adds second ship if at least 2
+#                     p0Ships.append([(1, 0), (1, 1)])                                        # positions ship in 0th column
+#                     p1Ships.append([(1, 0), (1, 1)])                                        # positions ship in 0th column
 
-                if (event.key in [pg.K_3, pg.K_4, pg.K_5]):                            # adds third ship if at least 3
-                    p0Ships.append([(2, 0), (2, 1), (2, 2)])                                # positions ship in 0th column
-                    p1Ships.append([(2, 0), (2, 1), (2, 2)])                                # positions ship in 0th column
+#                 if (event.key in [pg.K_3, pg.K_4, pg.K_5]):                            # adds third ship if at least 3
+#                     p0Ships.append([(2, 0), (2, 1), (2, 2)])                                # positions ship in 0th column
+#                     p1Ships.append([(2, 0), (2, 1), (2, 2)])                                # positions ship in 0th column
 
-                if (event.key in [pg.K_4, pg.K_5]):                                    # adds fourth ship if at least 4
-                    p0Ships.append([(3, 0), (3, 1), (3, 2), (3, 3)])                        # positions ship in 0th column
-                    p1Ships.append([(3, 0), (3, 1), (3, 2), (3, 3)])                        # positions ship in 0th column
+#                 if (event.key in [pg.K_4, pg.K_5]):                                    # adds fourth ship if at least 4
+#                     p0Ships.append([(3, 0), (3, 1), (3, 2), (3, 3)])                        # positions ship in 0th column
+#                     p1Ships.append([(3, 0), (3, 1), (3, 2), (3, 3)])                        # positions ship in 0th column
 
-                if (event.key in [pg.K_5]):                                            # adds fifth ship if it is 5
-                    p0Ships.append([(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)])                # positions ship in 0th column
-                    p1Ships.append([(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)])                # positions ship in 0th column
+#                 if (event.key in [pg.K_5]):                                            # adds fifth ship if it is 5
+#                     p0Ships.append([(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)])                # positions ship in 0th column
+#                     p1Ships.append([(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)])                # positions ship in 0th column
 
 
     def _drawShips(self, player=None):                                      # draws a player's ships
@@ -540,13 +540,17 @@ class PyGameLoop:
         #font          = pg.font.SysFont('Arial', 40)            # sets font for text within window (COMMENTED OUT FOR NOW, THINGS NEED TO BE INSTALLED FOR THE FONT)
 
         welcomeScreen = pg.image.load(os.path.join('assets', 'WelcomeScreen.png'))      # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
+        welcomeScreen = pg.transform.scale(welcomeScreen, (self._width/self._scale, self._height/self._scale))
         background    = pg.image.load(os.path.join('assets', 'LabeledBackground.png'))  # PHOTO HAS BEEN UPDATED WITH LABELS AND NEW SIZE
         background    = pg.transform.scale(background, (self._width/self._scale, self._height/self._scale))
         passToP0      = pg.image.load(os.path.join('assets', 'PassToP0.png'))           # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
+        passToP0      = pg.transform.scale(passToP0, (self._width/self._scale, self._height/self._scale))
         passToP1      = pg.image.load(os.path.join('assets', 'PassToP1.png'))           # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
         passToP1      = pg.transform.scale(passToP1, (self._width/self._scale, self._height/self._scale))
         winScreen     = [pg.image.load(os.path.join('assets', 'RedWinScreen.png')),     # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
                          pg.image.load(os.path.join('assets', 'GreenWinScreen.png'))]    # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
+        winScreen     = [pg.transform.scale(winScreen[0], (self._width/self._scale, self._height/self._scale)),
+                         pg.transform.scale(winScreen[1], (self._width/self._scale, self._height/self._scale))]
         '''
         gamePhase marks the phase of the game:
         0: Intro screen
@@ -555,11 +559,11 @@ class PyGameLoop:
         3: Shooting screen for either player
         4: Game over screen
         '''
-        gamePhase       = 1                                     # initializes to 1 for the intro screen
+        gamePhase       = 0                                     # initializes to 0 for the intro screen
         passingScreen   = False                                 # bool check to see if passing screen should overlay
         winner          = 2                                     # initializes to 2 to show no winner
-        p0UnplacedShips = []                                    # list to store the ships before placed by PlayerOne
-        p1UnplacedShips = []                                    # list to store the ships before placed by PlayerOne
+        # p0UnplacedShips = []                                    # list to store the ships before placed by PlayerOne
+        # p1UnplacedShips = []                                    # list to store the ships before placed by PlayerOne
 
         '''
         -------------------------------------------------------------------------------------------
@@ -568,13 +572,17 @@ class PyGameLoop:
         '''
         while (running):                                        # continuous game loop
             self._screen.fill("white")#set background color
-            chosen_num_ships = 5                                    # Need to be able to choose number of ships
+            # chosen_num_ships = 4                                    # Need to be able to choose number of ships
             pg.display.flip()                                       # updates the game window
             if (passingScreen):                                     # displays passing screen
-                if (gamePhase == 1 | self.battleship.turn == 0):        # displays pass to PlayerZero screen if in placement phase or their turn
+                print('passing')
+                if (gamePhase == 1 | self._battleship.turn == 0):        # displays pass to PlayerZero screen if in placement phase or their turn
                     self._screen.blit(passToP0, (0, 0))
                 else:                                                   # displays pass to PlayerOne screen if in placement phase or their turn
                     self._screen.blit(passToP1, (0, 0))
+                for event in pg.event.get():                        # tracking for some sort of event to get out of passing screen NOT WORKING RIGHT NOW
+                    if (event.type == pg.KEYDOWN | event.type == pg.MOUSEBUTTONDOWN):
+                        passingScreen = False
 
             else:                                                   # continues displaying the game if not in passing mode
                 '''
@@ -584,13 +592,36 @@ class PyGameLoop:
                 '''
                 while (gamePhase == 0):                                 # intro screen loop
                     self._screen.blit(welcomeScreen, (0, 0))
-                    
-                    self._createShips(p0UnplacedShips, p1UnplacedShips)     # populates default ship coordinates
-                    if (len(p0UnplacedShips) != 0):                         # checks if ships have been populated yet
-                        passingScreen = True                                    # enables passing screen
-                        gamePhase     = 1                                       # changes game phase to PlayerZero ship placement
+                    pg.display.flip()
+                    for event in pg.event.get():                                            # waits for keyboard event
+                        if (event.type == pg.KEYDOWN):
+                            if (event.key == pg.K_1):                                       # checks for 1 keypress
+                                chosen_num_ships = 1                                            # sets number of ships
+                                passingScreen = True                                            # enables passing screen
+                                gamePhase     = 1                                               # changes game phase to PlayerZero ship placement
+                            elif (event.key == pg.K_2):                                       # checks for 2 keypress
+                                chosen_num_ships = 2                                            # sets number of ships
+                                passingScreen = True                                            # enables passing screen
+                                gamePhase     = 1                                               # changes game phase to PlayerZero ship placement
+                            elif (event.key == pg.K_3):                                       # checks for 3 keypress
+                                chosen_num_ships = 3                                            # sets number of ships
+                                passingScreen = True                                            # enables passing screen
+                                gamePhase     = 1                                               # changes game phase to PlayerZero ship placement
+                            elif (event.key == pg.K_4):                                       # checks for 4 keypress
+                                chosen_num_ships = 4                                            # sets number of ships
+                                passingScreen = True                                            # enables passing screen
+                                gamePhase     = 1                                               # changes game phase to PlayerZero ship placement
+                            elif (event.key == pg.K_5):                                       # checks for 5 keypress
+                                chosen_num_ships = 5                                            # sets number of ships
+                                passingScreen = True                                            # enables passing screen
+                                gamePhase     = 1                                               # changes game phase to PlayerZero ship placement
+                    # self._createShips(p0UnplacedShips, p1UnplacedShips)     # populates default ship coordinates
+                    # if (len(p0UnplacedShips) != 0):                         # checks if ships have been populated yet
+                        # passingScreen = True                                    # enables passing screen
+                        # gamePhase     = 1                                       # changes game phase to PlayerZero ship placement
 
                 if (passingScreen):                                     # checks if passingScreen needs to display
+                    print(chosen_num_ships)                                 # testing here to ensure we're tracking the number correctly
                     continue                                                # continues to force the passing screen to display
 
                 '''
@@ -602,7 +633,7 @@ class PyGameLoop:
                     self._screen.blit(background, (0, 0))                   # displays game background containing both boards
                     #self._drawShips(0)                                      # draws PlayerZero ships
                     pg.display.flip()                                       # updates the game window
-                    p0_ship_list = self._placeShips(0,chosen_num_ships)
+                    p0_ship_list = self._placeShips(0, chosen_num_ships)
                     self._screen.fill("black")#set background color
                     self._screen.blit(passToP1, (0, 0))
                     pg.display.update()
@@ -614,7 +645,6 @@ class PyGameLoop:
                                 if event.key == pg.K_RETURN:#press the enter key
                                     switch = False
                     gamePhase = 2
-                    # logic for actual ship placement needs to go here
 
                 if (passingScreen):                                     # checks if passingScreen needs to display
                     continue                                                # continues to force the passing screen to display
@@ -641,7 +671,6 @@ class PyGameLoop:
                 -----------------------------------------------------------------------------------
                 '''
                 while(gamePhase == 3):                                      # core shooting game loop
-                    print("HELLO")
                     self._screen.blit(background, (0, 0))                   # draws boards
                     self._drawShips(self._battleship.turn)                  # draws current players' ships
                     self._drawShots()                                       # draws shots on each board
@@ -651,7 +680,7 @@ class PyGameLoop:
                         if (event.type == pg.MOUSEBUTTONDOWN):              # if event is mouse button down
                             mouse_coords = (pg.mouse.get_pos())
                             coords = self._pixToCoords(mouse_coords)          # gets the coordinates from the mouse position pixels
-                            print(coords)
+                            print(f'mouse coords: {mouse_coords}, grid coords: {coords}')
                             if (-1 in coords):                                      # invalid if either coordinate is negative
                                 continue                                                # goes to the next loop
                             
@@ -691,7 +720,7 @@ class PyGameLoop:
                             gamePhase        = 1                                    # reinitializes to 1 for the intro screen
                             winner           = 2                                    # reinitializes to 2 to show no winner
                             self._battleship = Battleship()                         # recreates Battleship
-                            p0UnplacedShips.clear()                                 # clear ships
-                            p1UnplacedShips.clear()                                 # clear ships
+                            # p0UnplacedShips.clear()                                 # clear ships
+                            # p1UnplacedShips.clear()                                 # clear ships
                             self._placedShips[0].clear()                            # clear ships
                             self._placedShips[1].clear()                            # clear ships
