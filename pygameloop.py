@@ -260,42 +260,42 @@ class PyGameLoop:
 
         if (self._battleship.turn == 0):                                        # runs if current turn is PlayerZero
             for i in range(len(self._battleship.boardZero.coordsMatrix)):                  # iterates through current player's board rows
-                for j in range(len(self._battleship.boardZero.coordsMatrix[0])):                                                 # iterates through current player's board columns
+                for j in range(len(self._battleship.boardZero.coordsMatrix[i])):                                                 # iterates through current player's board columns
                     match self._battleship.boardZero.coordsMatrix[i][j]:                           # checks if the current position has been shot in some way
                         case 1:                                                                 # matches a missed shot value PLACEHOLDER NUMBER
                             self._screen.blit(missedShot, self._coordsToPix(0, (i, j)))             # draws missed shot
-                        case 2:                                                                 # matches a hit shot value PLACEHOLDER NUMBER
+                        case 3:                                                                 # matches a hit shot value PLACEHOLDER NUMBER
                             self._screen.blit(hitShot, self._coordsToPix(0, (i, j)))                # draws hit shot
                         case 4:                                                                 # matches a sunk shot value PLACEHOLDER NUMBER
                             self._screen.blit(sunkShot, self._coordsToPix(0, (i, j)))               # draws sunk shot
 
             for i in range(len(self._battleship.boardOne.coordsMatrix)):                   # iterates through opponent's board rows
-                for j in range(len(self._battleship.boardOne.coordsMatrix[0])):                                                 # iterates through opponent's board columns
+                for j in range(len(self._battleship.boardOne.coordsMatrix[i])):                                                 # iterates through opponent's board columns
                     match self._battleship.boardOne.coordsMatrix[i][j]:                            # checks if the current position has been shot in some way
                         case 1:                                                                 # matches a missed shot value PLACEHOLDER NUMBER
                             self._screen.blit(missedShot, self._coordsToPix(1, (i, j)))             # draws missed shot
-                        case 2:                                                                 # matches a hit shot value PLACEHOLDER NUMBER
+                        case 3:                                                                 # matches a hit shot value PLACEHOLDER NUMBER
                             self._screen.blit(hitShot, self._coordsToPix(1, (i, j)))                # draws hit shot
                         case 4:                                                                 # matches a sunk shot value PLACEHOLDER NUMBER
                             self._screen.blit(sunkShot, self._coordsToPix(1, (i, j)))               # draws sunk shot
 
         else:                                                                   # runs if current turn is PlayerOne
             for i in range(len(self._battleship.boardOne.coordsMatrix)):                   # iterates through current player's board rows
-                for j in range(len(self._battleship.boardOne.coordsMatrix[0])):                                                 # iterates through current player's board columns
+                for j in range(len(self._battleship.boardOne.coordsMatrix[i])):                                                 # iterates through current player's board columns
                     match self._battleship.boardOne.coordsMatrix[i][j]:                            # checks if the current position has been shot in some way
                         case 1:                                                                 # matches a missed shot value PLACEHOLDER NUMBER
                             self._screen.blit(missedShot, self._coordsToPix(1, (i, j)))             # draws missed shot
-                        case 2:                                                                 # matches a hit shot value PLACEHOLDER NUMBER
+                        case 3:                                                                 # matches a hit shot value PLACEHOLDER NUMBER
                             self._screen.blit(hitShot, self._coordsToPix(1, (i, j)))                # draws hit shot
                         case 4:                                                                 # matches a sunk shot value PLACEHOLDER NUMBER
                             self._screen.blit(sunkShot, self._coordsToPix(1, (i, j)))               # draws sunk shot
 
             for i in range(len(self._battleship.boardZero.coordsMatrix)):                  # iterates through opponent's board rows
-                for j in range(len(self._battleship.boardZero.coordsMatrix[0])):                                                 # iterates through opponent's board columns
+                for j in range(len(self._battleship.boardZero.coordsMatrix[i])):                                                 # iterates through opponent's board columns
                     match self._battleship.boardZero.coordsMatrix[i][j]:                           # checks if the current position has been shot in some way
                         case 1:                                                                 # matches a missed shot value PLACEHOLDER NUMBER
                             self._screen.blit(missedShot, self._coordsToPix(0, (i, j)))             # draws missed shot
-                        case 2:                                                                 # matches a hit shot value PLACEHOLDER NUMBER
+                        case 3:                                                                 # matches a hit shot value PLACEHOLDER NUMBER
                             self._screen.blit(hitShot, self._coordsToPix(0, (i, j)))                # draws hit shot
                         case 4:                                                                 # matches a sunk shot value PLACEHOLDER NUMBER
                             self._screen.blit(sunkShot, self._coordsToPix(0, (i, j)))               # draws sunk shot
@@ -539,14 +539,14 @@ class PyGameLoop:
         fpsClock      = pg.time.Clock()                         # clock that FPS is based on
         #font          = pg.font.SysFont('Arial', 40)            # sets font for text within window (COMMENTED OUT FOR NOW, THINGS NEED TO BE INSTALLED FOR THE FONT)
 
-        welcomeScreen = pg.image.load(os.path.join('assets', 'WelcomeScreen.jpg'))      # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
+        welcomeScreen = pg.image.load(os.path.join('assets', 'WelcomeScreen.png'))      # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
         background    = pg.image.load(os.path.join('assets', 'LabeledBackground.png'))  # PHOTO HAS BEEN UPDATED WITH LABELS AND NEW SIZE
         background    = pg.transform.scale(background, (self._width/self._scale, self._height/self._scale))
-        passToP0      = pg.image.load(os.path.join('assets', 'PassToP0.jpg'))           # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
-        passToP1      = pg.image.load(os.path.join('assets', 'PassToP1.jpg'))           # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
+        passToP0      = pg.image.load(os.path.join('assets', 'PassToP0.png'))           # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
+        passToP1      = pg.image.load(os.path.join('assets', 'PassToP1.png'))           # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
         passToP1      = pg.transform.scale(passToP1, (self._width/self._scale, self._height/self._scale))
-        winScreen     = [pg.image.load(os.path.join('assets', 'RedWinScreen.jpg')),     # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
-                         pg.image.load(os.path.join('assets', 'BlueWinScreen.jpg'))]    # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
+        winScreen     = [pg.image.load(os.path.join('assets', 'RedWinScreen.png')),     # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
+                         pg.image.load(os.path.join('assets', 'GreenWinScreen.png'))]    # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
         '''
         gamePhase marks the phase of the game:
         0: Intro screen
@@ -650,6 +650,7 @@ class PyGameLoop:
                         if (event.type == pg.MOUSEBUTTONDOWN):              # if event is mouse button down
                             mouse_coords = (pg.mouse.get_pos())
                             coords = self._pixToCoords(mouse_coords)          # gets the coordinates from the mouse position pixels
+                            print(coords)
                             if (-1 in coords):                                      # invalid if either coordinate is negative
                                 continue                                                # goes to the next loop
                             
@@ -660,6 +661,10 @@ class PyGameLoop:
                             # pg.display.flip()                                       # updates the game window
 
                             winner = self._battleship.takeTurn(coords)              # sends coordinates to Battleship to take turn
+
+                            if (winner == 3):                                       # passes if the shot was invalid
+                                continue
+
                             if (winner != 2):                                       # someone has won if a 0 or 1 is returned, no one has one if it is a 2
                                 self._screen.blit(winScreen[winner], (0, 0))            # displays the winner's screen
                                 gamePhase = 4
