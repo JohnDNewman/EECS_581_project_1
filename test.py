@@ -122,6 +122,7 @@ def check_ship_v_ship(direction, ship_length, coords, other_ships: list[Ship]):
 
 
 while running:
+    
     screen.fill("white")#set background color
     screen.blit(board,(0,0)) #create board image on the background at coordintes 0,0 (top left corner)
     pg.draw.rect(screen, 'red', cursor)#draw the red box for the cursor location
@@ -236,6 +237,7 @@ while running:
                             cur_ship_image = shipImgs[shipsLeft-1]
                             cur_ship_image = pg.transform.scale(cur_ship_image,(100/mod,(100*curShipSize)/mod))
                             placed_ship_objects.append(Image(cur_ship_image,cursor.x-(2/mod),cursor.y-(2/mod)))
+                            
                             new_ship_coords = [] #create new coords for Ship ship
                             for i in range(curShipSize):#iterate shipsize times
                                 new_ship_coords.append((coords[0],coords[1]+i))#mark coords of ship using that

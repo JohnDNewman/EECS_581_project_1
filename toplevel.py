@@ -5,7 +5,6 @@ def main():
     # Instantiate the pygame class 
     
     game = PyGameLoop()
-    game.setUpGame()
     game.run()
 
 

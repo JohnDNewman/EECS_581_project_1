@@ -14,13 +14,15 @@ Coord integer meanings:
     - 3 = occupied, hit
     - 4 = occupied, sunk
 '''
+from ship import Ship
+
 class Board:
-    def __init__(self, shipList):                               # Assumes good inputs
+    def __init__(self, shipList: list[Ship]):                               # Assumes good inputs
         # Board coordinates:
         self.coordsMatrix = []                                  # Declare matrix to hold list of lists of coordinate flags
-        for row in range(100):                                  # 100 rows
+        for row in range(10):                                  # 100 rows
             tempRow = []                                        # Declare temp row for construction
-            for column in range(100):                           # 100 columns
+            for column in range(10):                           # 100 columns #made it 10 instead? why was it 100 kai
                 tempRow.append(0)                               # Append empty flag
             self.coordsMatrix.append(tempRow)                   # Append row to matrix
 
@@ -30,7 +32,7 @@ class Board:
         self.shipCount = len(shipList)                          # Number of ships on board
         for ship in range(self.shipCount):                      # For each ship in shipList
             tempList = []                                       # Reset temporary list
-            for coord in ship:                                  # For each coord in ship
+            for coord in shipList[ship].coords:                                  # For each coord in ship
                 tempList.append(0)                              # Append a not-hit flag to coord
             self.hitList.append(tempList)                       # Append flag list for that ship to hitList
     
@@ -58,7 +60,7 @@ class Board:
             for colNum, column in enumerate(row):               # For each column in coordsMatrix (declare index and value)
                                                                 # If correct coordinates based on coordsTuple,
                 if (rowNum == coordsTuple[0]) and (colNum == coordsTuple[1]):
-                    if self.coordsMatrix[row][column] == 2:     # If occupied and unhit,
+                    if self.coordsMatrix[rowNum][colNum] == 2:     # If occupied and unhit,
                         self.coordsMatrix[row][column] = 3      # Mark as occupied and hit
                         return True                             # Return True
                     elif self.coordsMatrix[row][column] == 0:   # If empty and unhit,
@@ -80,23 +82,29 @@ class Board:
                         return False                            # Return False
 
     # Matrix -> Boolean
-    def setBoard(self, shipList):                               # Assumes good inputs
+    def setBoard(self, shipList:list[Ship]):                               # Assumes good inputs
         for ship in shipList:                                   # For each ship in shipList
-                                                                # Call place ship and if unable,
-            if self._placeShip(shipList[ship], self.coordsMatrix) == False:
-                return False                                    # Return False
-            else:                                               # Else,
-                return True                                     # Return True
+            for coords in ship.coords:
+                if self._placeShip(coords) == False:
+                    return False                                    # Return False
+        #else:                                               # Else,
+        return True                                     # Return True
 
     # Tuple, Matrix -> Boolean
     def _placeShip(self, coordsTuple):                          # Assumes good inputs
-        for rowNum, row in enumerate(self.coordsMatrix):        # For each row in coordsMatrix (declare index and value)
-            for colNum, column in enumerate(row):               # For each column in coordsMatrix (declare index and value)
-                                                                # If correct coordinates based on coordsTuple,
-                if (rowNum == coordsTuple[0]) and (colNum == coordsTuple[1]):
-                                                                # If coordinates are empty,
-                    if (self.coordsMatrix[rowNum][colNum] == 0) or (self.coordsMatrix[rowNum][colNum] == 1):
-                        self.coordsMatrix[row][column] = 2      # Mark coords as occupied and unhit
-                        return True                             # Return True for valid placement
-                    else:                                       # Else,
-                        return False                            # Return False for invalid placement
+        if (self.coordsMatrix[coordsTuple[0]][coordsTuple[1]] == 0) or (self.coordsMatrix[coordsTuple[0]][coordsTuple[1]] == 1):
+            self.coordsMatrix[coordsTuple[0]][coordsTuple[1]] = 2      # Mark coords as occupied and unhit
+            return True                             # Return True for valid placement
+        else:                                       # Else,
+            return False 
+        #why the iteration when we just want to access the coords given?
+        # for rowNum, row in enumerate(self.coordsMatrix):        # For each row in coordsMatrix (declare index and value)
+        #     for colNum, column in enumerate(row):               # For each column in coordsMatrix (declare index and value)
+        #                                                         # If correct coordinates based on coordsTuple,
+        #         if (rowNum == coordsTuple[0]) and (colNum == coordsTuple[1]):
+        #                                                         # If coordinates are empty,
+        #             if (self.coordsMatrix[rowNum][colNum] == 0) or (self.coordsMatrix[rowNum][colNum] == 1):
+        #                 self.coordsMatrix[rowNum][colNum] = 2      # Mark coords as occupied and unhit
+        #                 return True                             # Return True for valid placement
+        #             else:                                       # Else,
+        #                 return False                            # Return False for invalid placement
