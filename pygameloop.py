@@ -641,6 +641,7 @@ class PyGameLoop:
                 -----------------------------------------------------------------------------------
                 '''
                 while(gamePhase == 3):                                      # core shooting game loop
+                    print("HELLO")
                     self._screen.blit(background, (0, 0))                   # draws boards
                     self._drawShips(self._battleship.turn)                  # draws current players' ships
                     self._drawShots()                                       # draws shots on each board
