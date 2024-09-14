@@ -641,6 +641,7 @@ class PyGameLoop:
                 -----------------------------------------------------------------------------------
                 '''
                 while(gamePhase == 3):                                      # core shooting game loop
+                    print("HELLO")
                     self._screen.blit(background, (0, 0))                   # draws boards
                     self._drawShips(self._battleship.turn)                  # draws current players' ships
                     self._drawShots()                                       # draws shots on each board
@@ -660,6 +661,7 @@ class PyGameLoop:
                             # pg.display.flip()                                       # updates the game window
 
                             winner = self._battleship.takeTurn(coords)              # sends coordinates to Battleship to take turn
+                            print(winner)
                             if (winner != 2):                                       # someone has won if a 0 or 1 is returned, no one has one if it is a 2
                                 self._screen.blit(winScreen[winner], (0, 0))            # displays the winner's screen
                                 gamePhase = 4

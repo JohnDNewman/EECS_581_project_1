@@ -28,10 +28,10 @@ class Board:
         self.shipList = shipList                                # Take in shipList from Battleship class
         self.hitList = []                                       # Indices in hitList match indices in shipList to indicate hit coords
         self.shipCount = len(shipList)                          # Number of ships on board
-        for ship in range(self.shipCount):                      # For each ship in shipList
+        for ship in shipList:                                   # For each ship in shipList
             tempList = []                                       # Reset temporary list
-            for coord in ship:                                  # For each coord in ship
-                tempList.append(0)                              # Append a not-hit flag to coord
+                                              # For each coord in ship
+            tempList.append(0)                              # Append a not-hit flag to coord
             self.hitList.append(tempList)                       # Append flag list for that ship to hitList
     
     # Index, List -> Boolean
@@ -83,7 +83,7 @@ class Board:
     def setBoard(self, shipList):                               # Assumes good inputs
         for ship in shipList:                                   # For each ship in shipList
                                                                 # Call place ship and if unable,
-            if self._placeShip(shipList[ship], self.coordsMatrix) == False:
+            if self._placeShip(self.coordsMatrix) == False:
                 return False                                    # Return False
             else:                                               # Else,
                 return True                                     # Return True
