@@ -1,7 +1,19 @@
+'''
+EECS 581 Project 1
+Description: Ship class that holds coords and can check if shot, how many times its been hit, how long it is
+Inputs: list of tuples for coords, direction for ship to face to help with display
+Outputs: Boolean values, ints for numhits and get length
+Team Members: Aiden Patel, Andrew McFerrin, John Newman, Landon Pyko
+Author: John Newman
+Creation Date: 9-11-2024
+'''
+
 class Ship:
-    def __init__(self, coords: list[tuple]):
+    def __init__(self, coords: list[tuple[int,int]], direction="none"):
         #create coords object based on size of ship
         self.coords = coords
+        #create a direction var to help imaging
+        self._direction = direction
         #create a private size attribute for convenience/debugging
         self._size = len(self.coords)
         #create _hitFlag and populate list based on size of ship
