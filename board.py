@@ -18,9 +18,9 @@ class Board:
     def __init__(self, shipList):                               # Assumes good inputs
         # Board coordinates:
         self.coordsMatrix = []                                  # Declare matrix to hold list of lists of coordinate flags
-        for row in range(10):                                  # 100 rows
+        for row in range(10):                                   # 100 rows
             tempRow = []                                        # Declare temp row for construction
-            for column in range(10):                           # 100 columns
+            for column in range(10):                            # 100 columns
                 tempRow.append(0)                               # Append empty flag
             self.coordsMatrix.append(tempRow)                   # Append row to matrix
 
