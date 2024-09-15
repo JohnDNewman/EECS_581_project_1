@@ -30,7 +30,7 @@ class Board:
         self.shipList = shipList                                # Take in shipList from Battleship class
         for ship in self.shipList:                              # Iterates through ships
             for coord in ship.coords:                           # Iterates through each coordinate of a ship
-                self.coordsMatrix[coord[0]][coord[1]] = 1       # Marks each coordinate with occupied, unhit flag
+                self.coordsMatrix[coord[0]][coord[1]] = 2       # Marks each coordinate with occupied, unhit flag
     
     # # Index, List -> Boolean
     # def isSunk(self):                                           # Assumes good inputs

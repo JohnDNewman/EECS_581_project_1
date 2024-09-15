@@ -583,12 +583,12 @@ class PyGameLoop:
         3: Shooting screen for either player
         4: Game over screen
         '''
-        gamePhase       = 1                                     # initializes to 0 for the intro screen
+        gamePhase       = 0                                     # initializes to 0 for the intro screen
         passingScreen   = False                                 # bool check to see if passing screen should overlay
         winner          = 2                                     # initializes to 2 to show no winner
         # p0UnplacedShips = []                                    # list to store the ships before placed by PlayerOne
         # p1UnplacedShips = []                                    # list to store the ships before placed by PlayerOne
-        chosen_num_ships = 5 #default value to test
+        chosen_num_ships = 1 #default value to test
 
         '''
         -------------------------------------------------------------------------------------------
@@ -597,17 +597,17 @@ class PyGameLoop:
         '''
         while (running):                                        # continuous game loop
             self._screen.fill("white")#set background color
-            # chosen_num_ships = 4                                    # Need to be able to choose number of ships
-            pg.display.flip()                                       # updates the game window
+            # events = pg.event.get()
             if (passingScreen):                                     # displays passing screen
-                print('passing')
-                events = pg.event.get()
+                #print('passing')
+                
                 if (gamePhase == 1 | self._battleship.turn == 0):        # displays pass to PlayerZero screen if in placement phase or their turn
                     self._screen.blit(passToP0, (0, 0))
                 else:                                                   # displays pass to PlayerOne screen if in placement phase or their turn
                     self._screen.blit(passToP1, (0, 0))
-                for event in events:                        # tracking for some sort of event to get out of passing screen NOT WORKING RIGHT NOW
-                    if (event.type == pg.KEYDOWN | event.type == pg.MOUSEBUTTONDOWN):
+                pg.display.flip()                                      # updates the game window
+                for event in pg.event.get():                        # tracking for some sort of event to get out of passing screen NOT WORKING RIGHT NOW
+                    if (event.type == pg.KEYDOWN or event.type == pg.MOUSEBUTTONDOWN):
                         passingScreen = False
 
             else:                                                   # continues displaying the game if not in passing mode
@@ -743,10 +743,11 @@ class PyGameLoop:
                             Reset values to play again
                             -----------------------------------------------------------------------
                             '''
-                            gamePhase        = 1                                    # reinitializes to 1 for the intro screen
+                            gamePhase        = 0                                    # reinitializes to 1 for the intro screen
                             winner           = 2                                    # reinitializes to 2 to show no winner
-                            self._battleship = Battleship()                         # recreates Battleship
+                        ######## Everything below is unneeded, remind me to trim fat if given time
+                            #self._battleship = Battleship()                         # recreates Battleship #NO, YOU NEED SHIPLIST TO DO THAT, it'll happen in gamephase 2 anyways
                             # p0UnplacedShips.clear()                                 # clear ships
                             # p1UnplacedShips.clear()                                 # clear ships
-                            self._placedShips[0].clear()                            # clear ships
-                            self._placedShips[1].clear()                            # clear ships
+                            # self._placedShips[0].clear()                            # clear ships
+                            # self._placedShips[1].clear()                            # clear ships

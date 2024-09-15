@@ -5,7 +5,7 @@ class Battleship:                                           #
           self.boardZero = Board(shipList0)                 # Positions of all ships for player 1
           self.boardOne = Board(shipList1)                  # Positions of all ships for player 2
           self.turn = 0                                     # Initialize the the turn as player 1's turn
-          self._curBoard = self.boardZero                   # Initialize the board for player 1's board
+          self._curBoard = self.boardOne                   # Initialize the board for player 1's board
 
 
     def takeTurn(self, coords):                         # This function is called when a player starts their turn
@@ -42,10 +42,10 @@ class Battleship:                                           #
         
     def _switchTurn(self):                  # This function is called by the previous function to switch the players turn after a move
         if self.turn == 0:                       # Check if it is player 1's turn
-            self._curBoard = self.boardOne   # If so, switch the board to player 2's board
+            self._curBoard = self.boardZero   # If so, switch the board to player 2's board
             self.turn = 1                        # Additionally switch to player 2's turn
         else:                               # If not, then it is player 2's turn and needs to be switched to player 1
-            self._curBoard = self.boardZero   # Switch board to player 1's board
+            self._curBoard = self.boardOne   # Switch board to player 1's board
             self.turn = 0                        # Switch to player 1's turn
  
           
