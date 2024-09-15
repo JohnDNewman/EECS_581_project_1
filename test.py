@@ -1,3 +1,6 @@
+'''
+THIS FILE IS FOR TESTING PURPOSES AND IS NOT USED WITHIN THE PROPER GAME
+'''
 # Making this file to test pygame stuff
 import pygame as pg
 import os

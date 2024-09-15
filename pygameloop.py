@@ -1,5 +1,16 @@
+'''
+EECS 581 Project 1
+Description: PyGameLoop class that stores all the logic for visualizing and running the Battleship game
+Inputs: User input through mouse clicks and key presses
+Outputs: Visualized game
+Team Members: Aiden Patel, Andrew McFerrin, John Newman, Kai Achen, Landon Pyko
+Author: Aiden Patel, Landon Pyko, John Newman
+Creation Date: 9-10-2024
+'''
+
 import pygame as pg
 import os
+import time
 from battleship import Battleship
 from ship import Ship
 os.environ['SDL_VIDEO_CENTERED'] = '1'
@@ -14,11 +25,11 @@ class PyGameLoop:
     def __init__(self):
         '''
         Each board is 1004x1004 and displayed side by side
-        10x10 pixels for each box with a 2 pixel outside border
-        50 pixel gap between them when displayed
+        100x100 pixels for each box with a 2 pixel outside border
+        50 pixel gap between the boards when displayed
         100 pixel gap on the left and top to show labels
-        Left board is where the player shoots
-        Right board is where the player places their ships
+        Left board is where PlayerZero (Red) places ships
+        Right board is where PlayerOne (Green) places ships
         '''
         singleBoardWidth  = 1004
         self._width       = 2 * singleBoardWidth + 50 + 100
@@ -196,39 +207,11 @@ class PyGameLoop:
                 x = 9
 
         return ((x, y))
+    
 
-
-# # Modified below section a bit. Checking if event.key is the right key instead of event.type
-
-#     def _createShips(self, p0Ships, p1Ships):                               # creates ship list based on number of ships
-#         for event in pg.event.get():                                            # waits for keyboard event
-#             if (event.type == pg.KEYDOWN):
-#                 if (event.key in [pg.K_1, pg.K_2, pg.K_3, pg.K_4, pg.K_5]):            # always adds one ship
-#                     p0Ships.append([(0, 0)])                                                # positions ship in 0th column
-#                     p1Ships.append([(0, 0)])                                                # positions ship in 0th column
-
-#                 if (event.key in [pg.K_2, pg.K_3, pg.K_4, pg.K_5]):                    # adds second ship if at least 2
-#                     p0Ships.append([(1, 0), (1, 1)])                                        # positions ship in 0th column
-#                     p1Ships.append([(1, 0), (1, 1)])                                        # positions ship in 0th column
-
-#                 if (event.key in [pg.K_3, pg.K_4, pg.K_5]):                            # adds third ship if at least 3
-#                     p0Ships.append([(2, 0), (2, 1), (2, 2)])                                # positions ship in 0th column
-#                     p1Ships.append([(2, 0), (2, 1), (2, 2)])                                # positions ship in 0th column
-
-#                 if (event.key in [pg.K_4, pg.K_5]):                                    # adds fourth ship if at least 4
-#                     p0Ships.append([(3, 0), (3, 1), (3, 2), (3, 3)])                        # positions ship in 0th column
-#                     p1Ships.append([(3, 0), (3, 1), (3, 2), (3, 3)])                        # positions ship in 0th column
-
-#                 if (event.key in [pg.K_5]):                                            # adds fifth ship if it is 5
-#                     p0Ships.append([(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)])                # positions ship in 0th column
-#                     p1Ships.append([(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)])                # positions ship in 0th column
-
-
-    def _drawShips(self, player=None):                                      # draws a player's ships
+    def _drawShips(self):                                      # draws a player's ships
         single_square_x = (100)/self._scale
         single_square_y = (100)/self._scale
-        if (player is None):                                                    # runs if nothing passed in
-            player = self._battleship.turn                                          # defaults to whose turn it is
 
         shipImgs = [[pg.image.load(os.path.join('assets', 'RedShip1.png')),     # loads all ship images
                      pg.image.load(os.path.join('assets', 'RedShip2.png')),
@@ -242,31 +225,31 @@ class PyGameLoop:
                      pg.image.load(os.path.join('assets', 'GreenShip4.png')),
                      pg.image.load(os.path.join('assets', 'GreenShip5.png'))]]
         
-        if player == 0:
+        if self._battleship.turn == 0:
             shipList = self._battleship.boardZero.shipList
         else:
             shipList = self._battleship.boardOne.shipList
 
         for ship in shipList:
-            cur_ship_image = shipImgs[player][ship.get_length()-1]
+            cur_ship_image = shipImgs[self._battleship.turn][ship.get_length()-1]
             if ship._direction == "right":
                 cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*ship.get_length())/self._scale))
                 cur_ship_image = pg.transform.rotate(cur_ship_image,90)
-                self._screen.blit(cur_ship_image, self._coordsToPix(player, ship.coords[0]))
+                self._screen.blit(cur_ship_image, self._coordsToPix(self._battleship.turn, ship.coords[0]))
             elif ship._direction == "left":
                 cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*ship.get_length())/self._scale))
                 cur_ship_image = pg.transform.rotate(cur_ship_image,90)
-                place_at_temp = self._coordsToPix(player, ship.coords[0])
+                place_at_temp = self._coordsToPix(self._battleship.turn, ship.coords[0])
                 place_at_x = place_at_temp[0] - (ship.get_length() * single_square_x)+single_square_x
                 place_at_y = place_at_temp[1]
                 place_at = tuple((place_at_x, place_at_y))
                 self._screen.blit(cur_ship_image, place_at)
             elif ship._direction == "down":
                 cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*ship.get_length())/self._scale))
-                self._screen.blit(cur_ship_image, self._coordsToPix(player, ship.coords[0]))
+                self._screen.blit(cur_ship_image, self._coordsToPix(self._battleship.turn, ship.coords[0]))
             elif ship._direction == "up":
                 cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*ship.get_length())/self._scale))
-                place_at_temp = self._coordsToPix(player, ship.coords[0])
+                place_at_temp = self._coordsToPix(self._battleship.turn, ship.coords[0])
                 cur_ship_image = pg.transform.rotate(cur_ship_image,180)
                 place_at_y = place_at_temp[1] - (ship.get_length() * single_square_y)+single_square_y
                 place_at_x = place_at_temp[0]
@@ -284,44 +267,44 @@ class PyGameLoop:
 
         if (self._battleship.turn == 0):                                        # runs if current turn is PlayerZero
             for i in range(len(self._battleship.boardZero.coordsMatrix)):                  # iterates through current player's board rows
-                for j in range(len(self._battleship.boardZero.coordsMatrix[i])):                                                 # iterates through current player's board columns
+                for j in range(len(self._battleship.boardZero.coordsMatrix[i])):               # iterates through current player's board columns
                     match self._battleship.boardZero.coordsMatrix[i][j]:                           # checks if the current position has been shot in some way
-                        case 1:                                                                 # matches a missed shot value PLACEHOLDER NUMBER
+                        case 1:                                                                 # matches a missed shot value 
                             self._screen.blit(missedShot, self._coordsToPix(0, (i, j)))             # draws missed shot
-                        case 3:                                                                 # matches a hit shot value PLACEHOLDER NUMBER
+                        case 3:                                                                 # matches a hit shot value 
                             self._screen.blit(hitShot, self._coordsToPix(0, (i, j)))                # draws hit shot
-                        case 4:                                                                 # matches a sunk shot value PLACEHOLDER NUMBER
+                        case 4:                                                                 # matches a sunk shot value 
                             self._screen.blit(sunkShot, self._coordsToPix(0, (i, j)))               # draws sunk shot
 
             for i in range(len(self._battleship.boardOne.coordsMatrix)):                   # iterates through opponent's board rows
-                for j in range(len(self._battleship.boardOne.coordsMatrix[i])):                                                 # iterates through opponent's board columns
+                for j in range(len(self._battleship.boardOne.coordsMatrix[i])):                # iterates through opponent's board columns
                     match self._battleship.boardOne.coordsMatrix[i][j]:                            # checks if the current position has been shot in some way
-                        case 1:                                                                 # matches a missed shot value PLACEHOLDER NUMBER
+                        case 1:                                                                 # matches a missed shot value 
                             self._screen.blit(missedShot, self._coordsToPix(1, (i, j)))             # draws missed shot
-                        case 3:                                                                 # matches a hit shot value PLACEHOLDER NUMBER
+                        case 3:                                                                 # matches a hit shot value 
                             self._screen.blit(hitShot, self._coordsToPix(1, (i, j)))                # draws hit shot
-                        case 4:                                                                 # matches a sunk shot value PLACEHOLDER NUMBER
+                        case 4:                                                                 # matches a sunk shot value 
                             self._screen.blit(sunkShot, self._coordsToPix(1, (i, j)))               # draws sunk shot
 
         else:                                                                   # runs if current turn is PlayerOne
             for i in range(len(self._battleship.boardOne.coordsMatrix)):                   # iterates through current player's board rows
-                for j in range(len(self._battleship.boardOne.coordsMatrix[i])):                                                 # iterates through current player's board columns
+                for j in range(len(self._battleship.boardOne.coordsMatrix[i])):                # iterates through current player's board columns
                     match self._battleship.boardOne.coordsMatrix[i][j]:                            # checks if the current position has been shot in some way
-                        case 1:                                                                 # matches a missed shot value PLACEHOLDER NUMBER
+                        case 1:                                                                 # matches a missed shot value 
                             self._screen.blit(missedShot, self._coordsToPix(1, (i, j)))             # draws missed shot
-                        case 3:                                                                 # matches a hit shot value PLACEHOLDER NUMBER
+                        case 3:                                                                 # matches a hit shot value 
                             self._screen.blit(hitShot, self._coordsToPix(1, (i, j)))                # draws hit shot
-                        case 4:                                                                 # matches a sunk shot value PLACEHOLDER NUMBER
+                        case 4:                                                                 # matches a sunk shot value 
                             self._screen.blit(sunkShot, self._coordsToPix(1, (i, j)))               # draws sunk shot
 
             for i in range(len(self._battleship.boardZero.coordsMatrix)):                  # iterates through opponent's board rows
-                for j in range(len(self._battleship.boardZero.coordsMatrix[i])):                                                 # iterates through opponent's board columns
+                for j in range(len(self._battleship.boardZero.coordsMatrix[i])):               # iterates through opponent's board columns
                     match self._battleship.boardZero.coordsMatrix[i][j]:                           # checks if the current position has been shot in some way
-                        case 1:                                                                 # matches a missed shot value PLACEHOLDER NUMBER
+                        case 1:                                                                 # matches a missed shot value 
                             self._screen.blit(missedShot, self._coordsToPix(0, (i, j)))             # draws missed shot
-                        case 3:                                                                 # matches a hit shot value PLACEHOLDER NUMBER
+                        case 3:                                                                 # matches a hit shot value 
                             self._screen.blit(hitShot, self._coordsToPix(0, (i, j)))                # draws hit shot
-                        case 4:                                                                 # matches a sunk shot value PLACEHOLDER NUMBER
+                        case 4:                                                                 # matches a sunk shot value 
                             self._screen.blit(sunkShot, self._coordsToPix(0, (i, j)))               # draws sunk shot
 
     def _placeShips(self, turn, num_ships):
@@ -559,9 +542,6 @@ class PyGameLoop:
         -------------------------------------------------------------------------------------------
         '''
         running       = True                                    # boolean for running the game loop
-        fps           = 60                                      # frames per second of the window
-        fpsClock      = pg.time.Clock()                         # clock that FPS is based on
-        #font          = pg.font.SysFont('Arial', 40)            # sets font for text within window (COMMENTED OUT FOR NOW, THINGS NEED TO BE INSTALLED FOR THE FONT)
 
         welcomeScreen = pg.image.load(os.path.join('assets', 'WelcomeScreen.png'))      # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
         welcomeScreen = pg.transform.scale(welcomeScreen, (self._width/self._scale, self._height/self._scale))
@@ -578,17 +558,15 @@ class PyGameLoop:
         '''
         gamePhase marks the phase of the game:
         0: Intro screen
-        1: PlayerZero ship placement screen
-        2: PlayerOne ship placement screen
+        1: PlayerZero (Red) ship placement screen
+        2: PlayerOne (Green) ship placement screen
         3: Shooting screen for either player
         4: Game over screen
         '''
         gamePhase       = 0                                     # initializes to 0 for the intro screen
         passingScreen   = False                                 # bool check to see if passing screen should overlay
         winner          = 2                                     # initializes to 2 to show no winner
-        # p0UnplacedShips = []                                    # list to store the ships before placed by PlayerOne
-        # p1UnplacedShips = []                                    # list to store the ships before placed by PlayerOne
-        chosen_num_ships = 1 #default value to test
+        chosen_num_ships = 1                                    # default value to test
 
         '''
         -------------------------------------------------------------------------------------------
@@ -597,16 +575,13 @@ class PyGameLoop:
         '''
         while (running):                                        # continuous game loop
             self._screen.fill("white")#set background color
-            # events = pg.event.get()
-            if (passingScreen):                                     # displays passing screen
-                #print('passing')
-                
-                if (gamePhase == 1 | self._battleship.turn == 0):        # displays pass to PlayerZero screen if in placement phase or their turn
+            if (passingScreen):                                     # displays passing screen                
+                if (gamePhase == 1 or (self._battleship.turn == 0 and gamePhase == 3)):        # displays pass to PlayerZero screen if in placement phase or their turn in shooting phase
                     self._screen.blit(passToP0, (0, 0))
                 else:                                                   # displays pass to PlayerOne screen if in placement phase or their turn
                     self._screen.blit(passToP1, (0, 0))
-                pg.display.flip()                                      # updates the game window
-                for event in pg.event.get():                        # tracking for some sort of event to get out of passing screen NOT WORKING RIGHT NOW
+                pg.display.flip()                                       # updates the game window
+                for event in pg.event.get():                            # tracking for some sort of event to get out of passing screen NOT WORKING RIGHT NOW
                     if (event.type == pg.KEYDOWN or event.type == pg.MOUSEBUTTONDOWN):
                         passingScreen = False
 
@@ -641,13 +616,8 @@ class PyGameLoop:
                                 chosen_num_ships = 5                                            # sets number of ships
                                 passingScreen = True                                            # enables passing screen
                                 gamePhase     = 1                                               # changes game phase to PlayerZero ship placement
-                    # self._createShips(p0UnplacedShips, p1UnplacedShips)     # populates default ship coordinates
-                    # if (len(p0UnplacedShips) != 0):                         # checks if ships have been populated yet
-                        # passingScreen = True                                    # enables passing screen
-                        # gamePhase     = 1                                       # changes game phase to PlayerZero ship placement
 
                 if (passingScreen):                                     # checks if passingScreen needs to display
-                    print(chosen_num_ships)                                 # testing here to ensure we're tracking the number correctly
                     continue                                                # continues to force the passing screen to display
 
                 '''
@@ -657,20 +627,10 @@ class PyGameLoop:
                 '''
                 while (gamePhase == 1):                                 # PlayerZero ship placement screen (CAN PROBABLY MAKE THE PLACEMENT PHASES A FUNCTION TO CALL FOR GIVEN PLAYER)
                     self._screen.blit(background, (0, 0))                   # displays game background containing both boards
-                    #self._drawShips(0)                                      # draws PlayerZero ships
                     pg.display.flip()                                       # updates the game window
                     p0_ship_list = self._placeShips(0, chosen_num_ships)
-                    self._screen.fill("black")#set background color
-                    self._screen.blit(passToP1, (0, 0))
-                    pg.display.update()
-                    switch = True
-                    while (switch):
-                        events = pg.event.get()#get events that have happened since last
-                        for event in events: #checking all events
-                            if event.type == pg.KEYDOWN:#if a key was pressed
-                                if event.key == pg.K_RETURN:#press the enter key
-                                    switch = False
                     gamePhase = 2
+                    passingScreen = True
 
                 if (passingScreen):                                     # checks if passingScreen needs to display
                     continue                                                # continues to force the passing screen to display
@@ -682,11 +642,11 @@ class PyGameLoop:
                 '''
                 while (gamePhase == 2):                                 # PlayerZero ship placement screen (CAN PROBABLY MAKE THE PLACEMENT PHASES A FUNCTION TO CALL FOR GIVEN PLAYER)
                     self._screen.blit(background, (0, 0))                   # displays game background containing both boards
-                    #self._drawShips(1)                                      # draws PlayerZero ships
                     pg.display.flip()                                       # updates the game window
                     p1_ship_list = self._placeShips(1,chosen_num_ships)
                     gamePhase = 3
                     self._battleship = Battleship(p0_ship_list,p1_ship_list)             # Create battleship proper
+                    passingScreen = True
 
                 if (passingScreen):                                     # checks if passingScreen needs to display
                     continue                                                # continues to force the passing screen to display
@@ -698,7 +658,7 @@ class PyGameLoop:
                 '''
                 while(gamePhase == 3):                                      # core shooting game loop
                     self._screen.blit(background, (0, 0))                   # draws boards
-                    self._drawShips(self._battleship.turn)                  # draws current players' ships
+                    self._drawShips()                                       # draws current players' ships
                     self._drawShots()                                       # draws shots on each board
                     pg.display.flip()                                       # updates the game window
 
@@ -709,24 +669,25 @@ class PyGameLoop:
                             print(f'mouse coords: {mouse_coords}, grid coords: {coords}')
                             if (-1 in coords):                                      # invalid if either coordinate is negative
                                 continue                                                # goes to the next loop
-                            
-                            ##QUESTION Is there a reason to have this here?
-                            # self._screen.blit(background, (0, 0))                   # draws boards
-                            # self._drawShips()                                       # draws current players' ships
-                            # self._drawShots()                                       # draws shots on each board
-                            # pg.display.flip()                                       # updates the game window
 
                             winner = self._battleship.takeTurn(coords)              # sends coordinates to Battleship to take turn
 
                             if (winner == 3):                                       # passes if the shot was invalid
                                 continue
+                            
+                            self._drawShots()                                       # draws updated shots
+                            pg.display.flip()                                       # updates the game window
+                            time.sleep(1)                                           # waits for a second to allow the player to see their shot
 
                             if (winner != 2):                                       # someone has won if a 0 or 1 is returned, no one has one if it is a 2
                                 self._screen.blit(winScreen[winner], (0, 0))            # displays the winner's screen
                                 gamePhase = 4
 
                             else:
-                                passingScreen = True
+                                passingScreen = True                                    # sets passing screen flag for end of turn
+
+                    if passingScreen:                                       # breaks loop to enter passing screen
+                        break
 
                 '''
                 -----------------------------------------------------------------------------------
@@ -737,17 +698,11 @@ class PyGameLoop:
                     self._screen.blit(winScreen[winner], (0, 0))            # displays the winner's screen
                     pg.display.flip()                                       # updates the game window
                     for event in pg.event.get():
-                        if (event.type == pg.MOUSEBUTTONDOWN):
+                        if (event.type == pg.KEYDOWN or event.type == pg.MOUSEBUTTONDOWN):
                             '''
                             -----------------------------------------------------------------------
                             Reset values to play again
                             -----------------------------------------------------------------------
                             '''
-                            gamePhase        = 0                                    # reinitializes to 1 for the intro screen
-                            winner           = 2                                    # reinitializes to 2 to show no winner
-                        ######## Everything below is unneeded, remind me to trim fat if given time
-                            #self._battleship = Battleship()                         # recreates Battleship #NO, YOU NEED SHIPLIST TO DO THAT, it'll happen in gamephase 2 anyways
-                            # p0UnplacedShips.clear()                                 # clear ships
-                            # p1UnplacedShips.clear()                                 # clear ships
-                            # self._placedShips[0].clear()                            # clear ships
-                            # self._placedShips[1].clear()                            # clear ships
+                            gamePhase = 0                                       # reinitializes to 1 for the intro screen
+                            winner    = 2                                       # reinitializes to 2 to show no winner

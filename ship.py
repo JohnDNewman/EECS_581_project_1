@@ -3,7 +3,7 @@ EECS 581 Project 1
 Description: Ship class that holds coords and can check if shot, how many times its been hit, how long it is
 Inputs: list of tuples for coords, direction for ship to face to help with display
 Outputs: Boolean values, ints for numhits and get length
-Team Members: Aiden Patel, Andrew McFerrin, John Newman, Landon Pyko
+Team Members: Aiden Patel, Andrew McFerrin, John Newman, Kai Achen, Landon Pyko
 Author: John Newman
 Creation Date: 9-11-2024
 '''
