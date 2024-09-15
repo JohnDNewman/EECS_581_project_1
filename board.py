@@ -53,7 +53,7 @@ class Board:
     def shoot(self, coordsTuple):                               # Assumes good inputs
         for ship in self.shipList:
             if ship.isHit(coordsTuple):
-                if ship.isSunk(coordsTuple):
+                if ship.isSunk():                            #is sunk does not take in any values
                     self.coordsMatrix[coordsTuple[0]][coordsTuple[1]] = 4   # Mark as occupied and hit
                 else:
                     self.coordsMatrix[coordsTuple[0]][coordsTuple[1]] = 3   # Mark as occupied and hit

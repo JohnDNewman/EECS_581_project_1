@@ -128,50 +128,72 @@ class PyGameLoop:
         return ((x + ((boardNum * 1054)/self._scale), y))                                     # if boardNum is 0, it's left board and won't shift, if 1, it'll add on the constant x value of the left board to shift
     
     
-    def _pixToCoords(self, pix :tuple):                                                  # takes in pixels and returns coordinate values SHOULD ONLY BE NEEDED FOR LEFT BOARD AND NOT RIGHT BOARD
+    def _pixToCoords(self, pix :tuple, board):                                                  # takes in pixels and returns coordinate values SHOULD ONLY BE NEEDED FOR LEFT BOARD AND NOT RIGHT BOARD
         x, y = -1, -1                                                           # initializes as -1 in case no coordinates are matched
         
-        if (pix[1] < 202):
+        if (pix[1] < 202/self._scale):
             y = 0
-        elif (pix[1] < 302):
+        elif (pix[1] < 302/self._scale):
             y = 1
-        elif (pix[1] < 402):
+        elif (pix[1] < 402/self._scale):
             y = 2
-        elif (pix[1] < 502):
+        elif (pix[1] < 502/self._scale):
             y = 3
-        elif (pix[1] < 602):
+        elif (pix[1] < 602/self._scale):
             y = 4
-        elif (pix[1] < 702):
+        elif (pix[1] < 702/self._scale):
             y = 5
-        elif (pix[1] < 802):
+        elif (pix[1] < 802/self._scale):
             y = 6
-        elif (pix[1] < 902):
+        elif (pix[1] < 902/self._scale):
             y = 7
-        elif (pix[1] < 1002):
+        elif (pix[1] < 1002/self._scale):
             y = 8
-        elif (pix[1] < 1104):
+        elif (pix[1] < 1104/self._scale):
             y = 9
 
-        if (pix[0] < 202):
-            x = 0
-        elif (pix[0] < 302):
-            x = 1
-        elif (pix[0] < 402):
-            x = 2
-        elif (pix[0] < 502):
-            x = 3
-        elif (pix[0] < 602):
-            x = 4
-        elif (pix[0] < 702):
-            x = 5
-        elif (pix[0] < 802):
-            x = 6
-        elif (pix[0] < 902):
-            x = 7
-        elif (pix[0] < 1002):
-            x = 8
-        elif (pix[0] < 1104):
-            x = 9
+        if board == 0:
+            if (pix[0] < (202+(1054))/self._scale):
+                x = 0
+            elif (pix[0] < (302+(1054))/self._scale):
+                x = 1
+            elif (pix[0] < (402+(1054))/self._scale):
+                x = 2
+            elif (pix[0] < (502+(1054))/self._scale):
+                x = 3
+            elif (pix[0] < (602+(1054))/self._scale):
+                x = 4
+            elif (pix[0] < (702+(1054))/self._scale):
+                x = 5
+            elif (pix[0] < (802+(1054))/self._scale):
+                x = 6
+            elif (pix[0] < (902+(1054))/self._scale):
+                x = 7
+            elif (pix[0] < (1002+(1054))/self._scale):
+                x = 8
+            elif (pix[0] < (1104+(1054))/self._scale):
+                x = 9
+        else:
+            if (pix[0] < (202)/self._scale):
+                x = 0
+            elif (pix[0] < (302)/self._scale):
+                x = 1
+            elif (pix[0] < (402)/self._scale):
+                x = 2
+            elif (pix[0] < (502)/self._scale):
+                x = 3
+            elif (pix[0] < (602)/self._scale):
+                x = 4
+            elif (pix[0] < (702)/self._scale):
+                x = 5
+            elif (pix[0] < (802)/self._scale):
+                x = 6
+            elif (pix[0] < (902)/self._scale):
+                x = 7
+            elif (pix[0] < (1002)/self._scale):
+                x = 8
+            elif (pix[0] < (1104)/self._scale):
+                x = 9
 
         return ((x, y))
 
@@ -559,11 +581,12 @@ class PyGameLoop:
         3: Shooting screen for either player
         4: Game over screen
         '''
-        gamePhase       = 0                                     # initializes to 0 for the intro screen
+        gamePhase       = 1                                     # initializes to 0 for the intro screen
         passingScreen   = False                                 # bool check to see if passing screen should overlay
         winner          = 2                                     # initializes to 2 to show no winner
         # p0UnplacedShips = []                                    # list to store the ships before placed by PlayerOne
         # p1UnplacedShips = []                                    # list to store the ships before placed by PlayerOne
+        chosen_num_ships = 5 #default value to test
 
         '''
         -------------------------------------------------------------------------------------------
@@ -576,11 +599,12 @@ class PyGameLoop:
             pg.display.flip()                                       # updates the game window
             if (passingScreen):                                     # displays passing screen
                 print('passing')
+                events = pg.event.get()
                 if (gamePhase == 1 | self._battleship.turn == 0):        # displays pass to PlayerZero screen if in placement phase or their turn
                     self._screen.blit(passToP0, (0, 0))
                 else:                                                   # displays pass to PlayerOne screen if in placement phase or their turn
                     self._screen.blit(passToP1, (0, 0))
-                for event in pg.event.get():                        # tracking for some sort of event to get out of passing screen NOT WORKING RIGHT NOW
+                for event in events:                        # tracking for some sort of event to get out of passing screen NOT WORKING RIGHT NOW
                     if (event.type == pg.KEYDOWN | event.type == pg.MOUSEBUTTONDOWN):
                         passingScreen = False
 
@@ -679,7 +703,7 @@ class PyGameLoop:
                     for event in pg.event.get():                            # waits for mouse event
                         if (event.type == pg.MOUSEBUTTONDOWN):              # if event is mouse button down
                             mouse_coords = (pg.mouse.get_pos())
-                            coords = self._pixToCoords(mouse_coords)          # gets the coordinates from the mouse position pixels
+                            coords = self._pixToCoords(mouse_coords,self._battleship.turn)          # gets the coordinates from the mouse position pixels
                             print(f'mouse coords: {mouse_coords}, grid coords: {coords}')
                             if (-1 in coords):                                      # invalid if either coordinate is negative
                                 continue                                                # goes to the next loop
