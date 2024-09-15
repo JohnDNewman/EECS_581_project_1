@@ -563,10 +563,11 @@ class PyGameLoop:
         3: Shooting screen for either player
         4: Game over screen
         '''
-        gamePhase       = 0                                     # initializes to 0 for the intro screen
-        passingScreen   = False                                 # bool check to see if passing screen should overlay
-        winner          = 2                                     # initializes to 2 to show no winner
-        chosen_num_ships = 1                                    # default value to test
+        gamePhase        = 0                                     # initializes to 0 for the intro screen
+        passingScreen    = False                                 # bool check to see if passing screen should overlay
+        winner           = 2                                     # initializes to 2 to show no winner
+        chosen_num_ships = 1                                     # default value to test
+        max_y            = (self._height-100)/self._scale        # sets max y height of window
 
         '''
         -------------------------------------------------------------------------------------------
@@ -675,6 +676,21 @@ class PyGameLoop:
                             if (winner == 3):                                       # passes if the shot was invalid
                                 continue
                             
+                            shotHit = False                                         # default value assuming shot missed
+                            if (self._battleship.turn == 0):                        # checks if turn is set to 0
+                                if self._battleship.boardZero.coordsMatrix[coords[0]][coords[1]] != 1:  # checks boardZero value at coord
+                                    shotHit = True                                                          # sets to true if shot was not a miss
+                            else:                                                   # if turn is set to 1
+                                if self._battleship.boardOne.coordsMatrix[coords[0]][coords[1]] != 1:   # checks boardOne value at coord
+                                    shotHit = True                                                          # sets to true if shot was not a miss
+
+                            font = pg.font.Font(None, 36)                           # set font size to 36 px
+                            if shotHit:
+                                text_surface = font.render("Hit!", True, (0,0,0))       # Tell the user the shot hit
+                            else:
+                                text_surface = font.render("Miss!", True, (0,0,0))      # Tell the user the shot hit
+                            
+                            self._screen.blit(text_surface, ((self._width/2)/self._scale,max_y+(100/self._scale)))
                             self._drawShots()                                       # draws updated shots
                             pg.display.flip()                                       # updates the game window
                             time.sleep(1)                                           # waits for a second to allow the player to see their shot
