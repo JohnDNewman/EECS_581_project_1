@@ -8,19 +8,23 @@ Author: Aiden Patel, Landon Pyko, John Newman
 Creation Date: 9-10-2024
 '''
 
-import pygame as pg
-import os
-import time
-from battleship import Battleship
-from ship import Ship
+import pygame as pg                                    # Import pygame
+import os                                              # Import os to access images in file system
+#Importing classes we made
+from battleship import Battleship                      # Import Battleship to create battleship
+from ship import Ship                                  # Import Ship to clarify fuction inputs
+
+#starts the window in the center of the screen
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
+#Image helper class to make displaying easier
 class Image:
-    def __init__(self, picture,x,y):
+    def __init__(self, picture,x,y):                   # Create image with picture and top left x,y coordinates
         self.picture = picture
         self.x = x
         self.y = y
 
+#Define class of Pygameloop in which the game runs
 class PyGameLoop:
     def __init__(self):
         '''
@@ -31,67 +35,64 @@ class PyGameLoop:
         Left board is where PlayerZero (Red) places ships
         Right board is where PlayerOne (Green) places ships
         '''
-        singleBoardWidth  = 1004
-        self._width       = 2 * singleBoardWidth + 50 + 100
-        self._height      = 1004 + 100
-        self._offset      = 4
+        singleBoardWidth  = 1004                                            # Width of game board from image in pixels
+        self._width       = 2 * singleBoardWidth + 50 + 100                 # Total width of screen given boards width and extra pixels for spacing
+        self._height      = 1004 + 100                                      # Total Height of screen given boards height and extra pixels for spacing.
+        self._offset      = 4                                               # Offset of the top left corner of the board to the top left corner of the first square (4,4) pixels really but simpler to store 4
 
-        self._battleship  = Battleship([Ship([(0,0)])],[Ship([(0,0)])])
-        self._screen      = pg.display.set_mode()     # initializes the window
-        self._display_info = pg.display.Info()
-        self._margin = 200 #margin of 200 pixels cause wtf not
-        self._scale = 1
-        # if self._width > (self._display_info.current_w + self._margin):
-        #     self._scale = self._width/self._display_info.current_w
+        self._battleship  = Battleship([Ship([(0,0)])],[Ship([(0,0)])])     # Initialize the battleship with dummy ships so the attribute exists to be edited later. Convenience
+        self._screen      = pg.display.set_mode()                           # initializes the window as default values to be edited later.
+        self._display_info = pg.display.Info()                              # Info about the Display, used for debugging in editor
+        self._margin = 200                                                  # Margin of 200 pixels to use for diaplying text and etc
+        self._scale = 2                                                     # Create a scale value to shrink window as most monitors aren't 2158 pixels wide or 1104 pixels tall.
 
-        # elif self._height > (self._display_info.current_h + self._margin):
-        #     self._scale = self._height/self._display_info.current_h
-        self._scale += 1
-        self._offset /= self._scale
-        self._screen      = pg.display.set_mode(((self._width+self._margin)/self._scale, (self._height+self._margin)/self._scale))     # initializes the window
-        self._placedShips = [[], []]                                 # list to store the user placed locations of the ships
+        self._margin /= self._scale                                         # Modify margin and offset by the scaling value
+        self._offset /= self._scale                                         # Modify margin and offset by the scaling value
+        self._screen      = pg.display.set_mode(((self._width+self._margin)/self._scale, (self._height+self._margin)/self._scale))     # initializes the window to actual values
 
-    #Function to check that ship placement doesn't go off board
+
+    #Function to check that ship placement doesn't go off board using coords
     def check_ship_v_map(self, direction, ship_length, coords):
-        if direction == "right":#checking going right
-            if coords[0] + (ship_length-1) > 9:#if shiplength times number of squares goes off the board
-                return False #return false
+        if direction == "right":                # If going right
+            if coords[0] + (ship_length-1) > 9: # If coords + number of sections in the ship minus the square it used goes off the board
+                return False                    # Return false
         elif direction == "left":
-            if coords[0] - (ship_length-1) < 0:#if shiplength times number of squares goes off the board
-                return False #return false
+            if coords[0] - (ship_length-1) < 0: # If coords - number of sections in the ship minus the square it used goes off the board
+                return False                    # Return false
         elif direction == "up":
-            if coords[1] - (ship_length-1) < 0:#if shiplength times number of squares goes off the board
-                return False #return false
+            if coords[1] - (ship_length-1) < 0: # If coords - number of sections in the ship minus the square it used goes off the board
+                return False                    # Return false
         elif direction == "down":
-            if coords[1] + (ship_length-1) > 9:#if shiplength times number of squares goes off the board
-                return False #return false
-        return True
+            if coords[1] + (ship_length-1) > 9: # If coords + number of sections in the ship minus the square it used goes off the board
+                return False                    # Return false
+        return True                             # If nothing is wrong, return True
 
-    #function to check if ship intersects ship
+    # Function to check if ship intersects ship
     def check_ship_v_ship(self, direction, ship_length, coords, other_ships: list[Ship]):
-        if direction == "right":#checking whatever direction chosen
-            for ship in other_ships:#for all ships placed already
-                for i in range(ship_length):#iterating through ever potential spot of the current ship
-                    if ship.isHit((coords[0]+i,coords[1])):#if the current spot would hit one of the other ships
-                        return False #return false as ships intersect
+        if direction == "right":                            # Checking whatever direction chosen
+            for ship in other_ships:                        # For all ships placed already
+                for i in range(ship_length):                # Iterating through every potential spot of the current ship
+                    if ship.in_ship((coords[0]+i,coords[1])): # If the current spot would hit one of the other ships
+                        return False                        # Return false as ships intersect
+        ## Identical for other directions ##
         elif direction == "left":
             for ship in other_ships:
                 for i in range(ship_length):
-                    if ship.isHit((coords[0]-i,coords[1])):
+                    if ship.in_ship((coords[0]-i,coords[1])):
                         return False
         elif direction == "down":
             for ship in other_ships:
                 for i in range(ship_length):
-                    if ship.isHit((coords[0],coords[1]+i)):
+                    if ship.in_ship((coords[0],coords[1]+i)):
                         return False
         elif direction == "up":
             for ship in other_ships:
                 for i in range(ship_length):
-                    if ship.isHit((coords[0],coords[1]-i)):
+                    if ship.in_ship((coords[0],coords[1]-i)):
                         return False
-        return True
+        return True                                         # If no ship collision, return True as its fine
 
-    def _coordsToPix(self, boardNum, coords):                                     # takes in 0 or 1 to indicate board to draw on and takes coords to returns pixels on given board
+    def _coordsToPix(self, boardNum, coords):               # Takes in 0 or 1 (0 is left board, 1 is right board) to indicate board to draw on and takes coords to returns pixels on given board
         match coords[1]:
             case 0:
                 y = 102/self._scale
@@ -136,13 +137,13 @@ class PyGameLoop:
             case 9:
                 x = 1002/self._scale
 
-        return ((x + ((boardNum * 1054)/self._scale), y))                                     # if boardNum is 0, it's left board and won't shift, if 1, it'll add on the constant x value of the left board to shift
+        return ((x + ((boardNum * 1054)/self._scale), y))   # If boardNum is 0, it's left board and won't shift, if 1, it'll add on the constant x value of the left board to shift
     
     
-    def _pixToCoords(self, pix :tuple, board):                                                  # takes in pixels and returns coordinate values SHOULD ONLY BE NEEDED FOR LEFT BOARD AND NOT RIGHT BOARD
-        x, y = -1, -1                                                           # initializes as -1 in case no coordinates are matched
+    def _pixToCoords(self, pix :tuple, board):              # takes in pixels and returns coordinate values depending on coord number
+        x, y = -1, -1                                       # initializes as -1 in case no coordinates are matched
         
-        if (pix[1] < 202/self._scale):
+        if (pix[1] < 202/self._scale):                      # Y is self explanitory, If the y value is less than on of the options, then its in that square
             y = 0
         elif (pix[1] < 302/self._scale):
             y = 1
@@ -163,7 +164,7 @@ class PyGameLoop:
         elif (pix[1] < 1104/self._scale):
             y = 9
 
-        if board == 0:
+        if board == 0:                                      # X takes board value to determine if should be checking left or right board (0 is means player 0 which means target right board. 1 is opposite)
             if (pix[0] < (202+(1054))/self._scale):
                 x = 0
             elif (pix[0] < (302+(1054))/self._scale):
@@ -206,11 +207,11 @@ class PyGameLoop:
             elif (pix[0] < (1104)/self._scale):
                 x = 9
 
-        return ((x, y))
+        return ((x, y))                                     # Return the given value
     
 
-    def _drawShips(self):                                      # draws a player's ships
-        single_square_x = (100)/self._scale
+    def _drawShips(self):                                      # Draws ships on board. Internal logic determines if player 0 or player 1s board is drawn
+        single_square_x = (100)/self._scale #helper values
         single_square_y = (100)/self._scale
 
         shipImgs = [[pg.image.load(os.path.join('assets', 'RedShip1.png')),     # loads all ship images
@@ -225,92 +226,92 @@ class PyGameLoop:
                      pg.image.load(os.path.join('assets', 'GreenShip4.png')),
                      pg.image.load(os.path.join('assets', 'GreenShip5.png'))]]
         
-        if self._battleship.turn == 0:
-            shipList = self._battleship.boardZero.shipList
-        else:
-            shipList = self._battleship.boardOne.shipList
+        if self._battleship.turn == 0:                          # If player 0 turn
+            shipList = self._battleship.boardZero.shipList      # Get ship list from player 0
+        else:                                                   # Since only two options, if not player 0, player 1
+            shipList = self._battleship.boardOne.shipList       # Get ship list from player 1
 
-        for ship in shipList:
-            cur_ship_image = shipImgs[self._battleship.turn][ship.get_length()-1]
-            if ship._direction == "right":
-                cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*ship.get_length())/self._scale))
-                cur_ship_image = pg.transform.rotate(cur_ship_image,90)
-                self._screen.blit(cur_ship_image, self._coordsToPix(self._battleship.turn, ship.coords[0]))
-            elif ship._direction == "left":
-                cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*ship.get_length())/self._scale))
-                cur_ship_image = pg.transform.rotate(cur_ship_image,90)
-                place_at_temp = self._coordsToPix(self._battleship.turn, ship.coords[0])
-                place_at_x = place_at_temp[0] - (ship.get_length() * single_square_x)+single_square_x
+        for ship in shipList:                                                                                               # For ship in shipList from player
+            cur_ship_image = shipImgs[self._battleship.turn][ship.get_length()-1]                                           # Get image for ship based on the fact player 0s are in 0 index and same for player 1,
+                                                                                                                            # and ships ordered by length, so ship of length 5 is in index 4
+            if ship.get_direction() == "right":                                                                             # Based on direction of ship
+                cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*ship.get_length())/self._scale))   # Scale ship image to fit the sections, 100 wide, shiplength * 100 long Divided by scaling value
+                cur_ship_image = pg.transform.rotate(cur_ship_image,90)                                                     # Rotate ship image to fit direction
+                self._screen.blit(cur_ship_image, self._coordsToPix(self._battleship.turn, ship.coords[0]))                 # Place ship at the expected place using conversion function of coords to pix
+            elif ship.get_direction() == "left":                                                                            # Same as above
+                cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*ship.get_length())/self._scale))   # Same as above
+                cur_ship_image = pg.transform.rotate(cur_ship_image,90)                                                     # Same as above
+                place_at_temp = self._coordsToPix(self._battleship.turn, ship.coords[0])                                    # Image always works from top left so left needs to be translated left by ship length
+                place_at_x = place_at_temp[0] - (ship.get_length() * single_square_x)+single_square_x                       # Rest is just calculating that spot, feel free to make it smoother
                 place_at_y = place_at_temp[1]
                 place_at = tuple((place_at_x, place_at_y))
                 self._screen.blit(cur_ship_image, place_at)
-            elif ship._direction == "down":
-                cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*ship.get_length())/self._scale))
-                self._screen.blit(cur_ship_image, self._coordsToPix(self._battleship.turn, ship.coords[0]))
-            elif ship._direction == "up":
+            elif ship.get_direction() == "down":                                                                            # Like the right placement to the left placement
+                cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*ship.get_length())/self._scale))   # scale image
+                self._screen.blit(cur_ship_image, self._coordsToPix(self._battleship.turn, ship.coords[0]))                 # No need to rotate as ships are vertically oriented in images
+            elif ship.get_direction() == "up":                                                                              # Like left, must by modified by ship length up, again, feel free to make it smoother
                 cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*ship.get_length())/self._scale))
                 place_at_temp = self._coordsToPix(self._battleship.turn, ship.coords[0])
-                cur_ship_image = pg.transform.rotate(cur_ship_image,180)
                 place_at_y = place_at_temp[1] - (ship.get_length() * single_square_y)+single_square_y
                 place_at_x = place_at_temp[0]
                 place_at = tuple((place_at_x, place_at_y))
                 self._screen.blit(cur_ship_image, place_at)
 
 
-    def _drawShots(self):                                                   # draws all the shots taken in the game on the correct side
-        missedShot = pg.image.load(os.path.join('assets', 'MissedShot.png'))
-        missedShot = pg.transform.scale(missedShot,(100/self._scale,100/self._scale))
-        hitShot    = pg.image.load(os.path.join('assets', 'HitShot.png'))
-        hitShot    = pg.transform.scale(hitShot,(100/self._scale,100/self._scale))
-        sunkShot   = pg.image.load(os.path.join('assets', 'SunkShot.png'))
-        sunkShot   = pg.transform.scale(sunkShot,(100/self._scale,100/self._scale))
+    def _drawShots(self):                                                                   # draws all the shots taken in the game on the correct side
+        missedShot = pg.image.load(os.path.join('assets', 'MissedShot.png'))                # Load image for missed shots
+        missedShot = pg.transform.scale(missedShot,(100/self._scale,100/self._scale))       # Scale image
+        hitShot    = pg.image.load(os.path.join('assets', 'HitShot.png'))                   # Load image for hit shots
+        hitShot    = pg.transform.scale(hitShot,(100/self._scale,100/self._scale))          # Scale image
+        sunkShot   = pg.image.load(os.path.join('assets', 'SunkShot.png'))                  # Load image for sunk shots, when ship is sunk
+        sunkShot   = pg.transform.scale(sunkShot,(100/self._scale,100/self._scale))         # Scale image
 
-        if (self._battleship.turn == 0):                                        # runs if current turn is PlayerZero
-            for i in range(len(self._battleship.boardZero.coordsMatrix)):                  # iterates through current player's board rows
-                for j in range(len(self._battleship.boardZero.coordsMatrix[i])):               # iterates through current player's board columns
-                    match self._battleship.boardZero.coordsMatrix[i][j]:                           # checks if the current position has been shot in some way
-                        case 1:                                                                 # matches a missed shot value 
-                            self._screen.blit(missedShot, self._coordsToPix(0, (i, j)))             # draws missed shot
-                        case 3:                                                                 # matches a hit shot value 
-                            self._screen.blit(hitShot, self._coordsToPix(0, (i, j)))                # draws hit shot
-                        case 4:                                                                 # matches a sunk shot value 
-                            self._screen.blit(sunkShot, self._coordsToPix(0, (i, j)))               # draws sunk shot
+        if (self._battleship.turn == 0):                                                    # runs if current turn is PlayerZero
+            for i in range(len(self._battleship.boardZero.coordsMatrix)):                   # iterates through current player's board rows
+                for j in range(len(self._battleship.boardZero.coordsMatrix[i])):            # iterates through current player's board columns
+                    match self._battleship.boardZero.coordsMatrix[i][j]:                    # checks if the current position has been shot in some way
+                        case 1:                                                             # matches a missed shot value 
+                            self._screen.blit(missedShot, self._coordsToPix(0, (i, j)))     # draws missed shot
+                        case 3:                                                             # matches a hit shot value 
+                            self._screen.blit(hitShot, self._coordsToPix(0, (i, j)))        # draws hit shot
+                        case 4:                                                             # matches a sunk shot value 
+                            self._screen.blit(sunkShot, self._coordsToPix(0, (i, j)))       # draws sunk shot
 
-            for i in range(len(self._battleship.boardOne.coordsMatrix)):                   # iterates through opponent's board rows
-                for j in range(len(self._battleship.boardOne.coordsMatrix[i])):                # iterates through opponent's board columns
-                    match self._battleship.boardOne.coordsMatrix[i][j]:                            # checks if the current position has been shot in some way
-                        case 1:                                                                 # matches a missed shot value 
-                            self._screen.blit(missedShot, self._coordsToPix(1, (i, j)))             # draws missed shot
-                        case 3:                                                                 # matches a hit shot value 
-                            self._screen.blit(hitShot, self._coordsToPix(1, (i, j)))                # draws hit shot
-                        case 4:                                                                 # matches a sunk shot value 
-                            self._screen.blit(sunkShot, self._coordsToPix(1, (i, j)))               # draws sunk shot
+            for i in range(len(self._battleship.boardOne.coordsMatrix)):                    # iterates through opponent's board rows
+                for j in range(len(self._battleship.boardOne.coordsMatrix[i])):             # iterates through opponent's board columns
+                    match self._battleship.boardOne.coordsMatrix[i][j]:                     # checks if the current position has been shot in some way
+                        case 1:                                                             # matches a missed shot value 
+                            self._screen.blit(missedShot, self._coordsToPix(1, (i, j)))     # draws missed shot
+                        case 3:                                                             # matches a hit shot value 
+                            self._screen.blit(hitShot, self._coordsToPix(1, (i, j)))        # draws hit shot
+                        case 4:                                                             # matches a sunk shot value 
+                            self._screen.blit(sunkShot, self._coordsToPix(1, (i, j)))       # draws sunk shot
 
-        else:                                                                   # runs if current turn is PlayerOne
-            for i in range(len(self._battleship.boardOne.coordsMatrix)):                   # iterates through current player's board rows
-                for j in range(len(self._battleship.boardOne.coordsMatrix[i])):                # iterates through current player's board columns
-                    match self._battleship.boardOne.coordsMatrix[i][j]:                            # checks if the current position has been shot in some way
-                        case 1:                                                                 # matches a missed shot value 
-                            self._screen.blit(missedShot, self._coordsToPix(1, (i, j)))             # draws missed shot
-                        case 3:                                                                 # matches a hit shot value 
-                            self._screen.blit(hitShot, self._coordsToPix(1, (i, j)))                # draws hit shot
-                        case 4:                                                                 # matches a sunk shot value 
-                            self._screen.blit(sunkShot, self._coordsToPix(1, (i, j)))               # draws sunk shot
+        else:                                                                               # runs if current turn is PlayerOne (otherwise identical to above)
+            for i in range(len(self._battleship.boardOne.coordsMatrix)):                    # iterates through current player's board rows
+                for j in range(len(self._battleship.boardOne.coordsMatrix[i])):             # iterates through current player's board columns
+                    match self._battleship.boardOne.coordsMatrix[i][j]:                     # checks if the current position has been shot in some way
+                        case 1:                                                             # matches a missed shot value 
+                            self._screen.blit(missedShot, self._coordsToPix(1, (i, j)))     # draws missed shot
+                        case 3:                                                             # matches a hit shot value 
+                            self._screen.blit(hitShot, self._coordsToPix(1, (i, j)))        # draws hit shot
+                        case 4:                                                             # matches a sunk shot value 
+                            self._screen.blit(sunkShot, self._coordsToPix(1, (i, j)))       # draws sunk shot
 
-            for i in range(len(self._battleship.boardZero.coordsMatrix)):                  # iterates through opponent's board rows
-                for j in range(len(self._battleship.boardZero.coordsMatrix[i])):               # iterates through opponent's board columns
-                    match self._battleship.boardZero.coordsMatrix[i][j]:                           # checks if the current position has been shot in some way
-                        case 1:                                                                 # matches a missed shot value 
-                            self._screen.blit(missedShot, self._coordsToPix(0, (i, j)))             # draws missed shot
-                        case 3:                                                                 # matches a hit shot value 
-                            self._screen.blit(hitShot, self._coordsToPix(0, (i, j)))                # draws hit shot
-                        case 4:                                                                 # matches a sunk shot value 
-                            self._screen.blit(sunkShot, self._coordsToPix(0, (i, j)))               # draws sunk shot
+            for i in range(len(self._battleship.boardZero.coordsMatrix)):                   # iterates through opponent's board rows
+                for j in range(len(self._battleship.boardZero.coordsMatrix[i])):            # iterates through opponent's board columns
+                    match self._battleship.boardZero.coordsMatrix[i][j]:                    # checks if the current position has been shot in some way
+                        case 1:                                                             # matches a missed shot value 
+                            self._screen.blit(missedShot, self._coordsToPix(0, (i, j)))     # draws missed shot
+                        case 3:                                                             # matches a hit shot value 
+                            self._screen.blit(hitShot, self._coordsToPix(0, (i, j)))        # draws hit shot
+                        case 4:                                                             # matches a sunk shot value 
+                            self._screen.blit(sunkShot, self._coordsToPix(0, (i, j)))       # draws sunk shot
 
     def _placeShips(self, turn, num_ships):
-        background    = pg.image.load(os.path.join('assets', 'LabeledBackground.png'))  # PHOTO HAS BEEN UPDATED WITH LABELS AND NEW SIZE
-        background    = pg.transform.scale(background, (self._width/self._scale, self._height/self._scale))
-        shipImgs = [[pg.image.load(os.path.join('assets', 'RedShip1.png')),     # loads all ship images
+        background    = pg.image.load(os.path.join('assets', 'LabeledBackground.png'))                      # Load background image
+        background    = pg.transform.scale(background, (self._width/self._scale, self._height/self._scale)) # Scale background image
+        shipImgs = [[pg.image.load(os.path.join('assets', 'RedShip1.png')),     # loads all ship images (Probably could have made this an attribute given the number of accesses) 
                      pg.image.load(os.path.join('assets', 'RedShip2.png')),
                      pg.image.load(os.path.join('assets', 'RedShip3.png')),
                      pg.image.load(os.path.join('assets', 'RedShip4.png')),
@@ -323,236 +324,240 @@ class PyGameLoop:
                      pg.image.load(os.path.join('assets', 'GreenShip5.png'))]]
         
         ## CREATING TEXT FOR IN GAME EVENTS
-        # pg.init()
-        font = pg.font.Font(None, 36)#set font size to 36 px
-        text_surface = font.render("What Direction will the ship extend?", True, (0,0,0)) #remind players to choose a direction for ship to go
-        place_err_map = font.render("Ship off map", True, (0,0,0)) #Tell player that direction would make the ship go off the map
-        place_err_flag = False # a flag to use to display the ship place error.
+        font = pg.font.Font(None, 36)                                                       #set font size to 36 px arbitrarily
+        text_surface = font.render("What Direction will the ship extend?", True, (0,0,0))   #remind players to choose a direction for ship to go
+        place_err_map = font.render("Ship off map", True, (0,0,0))                          #Tell player that direction would make the ship go off the map
+        place_err_flag = False                                                              # a flag to use to display the ship place error.
 
-        place_err_ship = font.render("Ship would intersect Ship", True, (0,0,0)) #Tell player that direction would make the ship go off the map
-        place_err_ship_flag = False # a flag to use to display the ship place error.
+        place_err_ship = font.render("Ship would intersect Ship", True, (0,0,0))            #Tell player that direction would make the ship go off the map
+        place_err_ship_flag = False                                                         #A flag to use to display the ship place error.
 
-        placed = font.render("All Ships Have been Placed!", True, (0,0,0)) #Indicate ships have been placed
+        placed = font.render("All Ships Have been Placed!", True, (0,0,0))                  #Indicate ships have been placed
 
-        # 1056? is starting position. Highlight starting position
-        # Width of a square on the board is 102
-        coords = [0,0] #"coordinates" of the cursor. 0,0 to 9,9 to ease in making ships
-        single_square_x = (100)/self._scale
-        single_square_y = (100)/self._scale
-        if turn == 0:
-            max_x = (1004)/self._scale
-        elif turn == 1:
-            max_x = (2058)/self._scale
-        max_y = (self._height-100)/self._scale
-        min_x = ((100 + (turn*1054))/self._scale)
-        min_y = 100/self._scale
-        highlightedSquare = (0,0)
-        allPlaced = False
-        placePrompt = False
-        shipList = []
-        placed_ship_objects = [] #Placeholder while player class doesn't exist
+        coords = [0,0]                                                                      #"coordinates" of the cursor. 0,0 to 9,9 to ease in making ships
+        single_square_x = (100)/self._scale                                                 # Helper values
+        single_square_y = (100)/self._scale                                                 # Helper values
 
-        def_x = min_x + self._offset
-        def_y = (100/self._scale)+self._offset
+        if turn == 0:                                                                       # If player 0 is placing, max placement is edge of left board
+            max_x = (1004)/self._scale                                                      # edge of left board div by scale
+        elif turn == 1:                                                                     # If player 1 is placing, max placement is edge of right board
+            max_x = (2058)/self._scale                                                      # edge of right board div by scale
         
-        #cursor = pg.Rect((min_x + offset,offset), (single_square_x-offset,single_square_y-offset))((y-4)/10)/mod
-        cursor = pg.Rect((def_x,def_y), (single_square_x-self._offset,single_square_y-self._offset))
-        
-        while not allPlaced:
-            self._screen.fill("white")#set background color
-            self._screen.blit(background, (0, 0))
-            pg.draw.rect(self._screen, 'red', cursor)
+        max_y = (self._height-100)/self._scale                                              # Max_y is consitent between baords. height of board - 100 for border divided by scale
 
-            for image in placed_ship_objects: # for ship in placed ships, draw the image of the ship
-                self._screen.blit(image.picture, (image.x,image.y))
+        min_x = ((100 + (turn*1054))/self._scale)                                           # Min x is 100 for border + either 0 for player zero and left baord or 1054 for player 1 and right board all divided by scale
+        min_y = 100/self._scale                                                             # min y is consiteint between players. 100 for border div by scale
+
+        allPlaced = False                                                                   # used to exit the loop once true
+        placePrompt = False                                                                 # flag for when player is placing a ship
+        shipList = []                                                                       # list to hold created ships to pass into battleship constructor
+        placed_ship_objects = []                                                            # Used to draw ships while battleship constructor doesn't exist yet
+
+        def_x = min_x + self._offset                                                        # Helper value to create cursor starting point for readability
+        def_y = (100/self._scale)+self._offset                                              # Helper value to create cursor starting point for readability
+        
+        cursor = pg.Rect((def_x,def_y), (single_square_x-self._offset,single_square_y-self._offset)) #create cursor indicating chosen spot, where defx and defy are top left coords and the other values is the size
+        
+
+        while not allPlaced:                                                                # While ships have yet to be placed
+                                                            ### DISPLAY STUFF ###
+            self._screen.fill("white")                                                      # set background color
+            self._screen.blit(background, (0, 0))                                           # Display the boards
+            pg.draw.rect(self._screen, 'red', cursor)                                       # Create cursor image
+
+            for image in placed_ship_objects:                                               # for ship in placed ships, draw the image of the ship (used as drawships can't be called without battleship constructor)
+                self._screen.blit(image.picture, (image.x,image.y))                         # drawing the ship
             
-            ## DRAWING TEXT PROMPTS FOR USER
-            if placePrompt:# to place ship
+                                                        ## DRAWING TEXT PROMPTS FOR USER ##
+            if placePrompt:                                                                 # to place ship
                 self._screen.blit(text_surface, ((self._width/2)/self._scale,max_y+(100/self._scale)))
-            if place_err_flag: #ship goes off map error
+            if place_err_flag:                                                              # error displayed if ship goes off map error
                 self._screen.blit(place_err_map, ((self._width/2)/self._scale,max_y+(100/self._scale)))
-            if place_err_ship_flag: #ship would interact another ship error
-                self._screen.blit(place_err_ship, ((self._width/2)/self._scale,max_y+(10/self._scale)))
+            if place_err_ship_flag:                                                         # error displated if ship would interact another ship error
+                self._screen.blit(place_err_ship, ((self._width/2)/self._scale,max_y+(100/self._scale)))
             
-            pg.display.update()
+            pg.display.update()                                                             # update display with the above stuff
+                                                            ### END DISPLAY STUFF ###
 
-            events = pg.event.get()
+                                                            ### EVENT STUFF ###
+            events = pg.event.get()                                                         # get events from pygame
 
-            for event in events:
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_RIGHT:
-                        if placePrompt:#if the placeprompt is on then do ship placement logic
-                            if self.check_ship_v_map("right", num_ships, coords):
+            for event in events:                                                            # Check all events
+                if event.type == pg.KEYDOWN:                                                # If a key was pressed
+                    if event.key == pg.K_RIGHT:                                             # If that key was rght
+                        if placePrompt:                                                     # if the placeprompt is on then do ship placement logic
+                            if self.check_ship_v_map("right", num_ships, coords):           #check ship doesn't go off map or intersect a previsiouly placed ship
                                 if self.check_ship_v_ship("right", num_ships, coords, shipList):
-                                    # curShipSize = num_ships    # If we have 5 ships left, we want the 4th index. 4 left, 3rd index, and so on
-                                    cur_ship_image = shipImgs[turn][num_ships-1]  # Get next ship image
-                                    cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*num_ships)/self._scale)) #scale give ship image by the needed values
-                                    #100 pixels x, 100* ship size as ships are oriented vertically until rotated
-                                    cur_ship_image = pg.transform.rotate(cur_ship_image,90)#rotate ship to match direction chosen
-                                    placed_ship_objects.append(Image(cur_ship_image,cursor.x-(2/self._scale),cursor.y-(2/self._scale)))#add ship image to placed_ship_objects so its drawn
-                                    new_ship_coords = [] #create new coords for Ship ship
-                                    for i in range(num_ships):#iterate shipsize times
-                                        new_ship_coords.append((coords[0]+i,coords[1]))#mark coords of ship using that
-                                    newShip = Ship(new_ship_coords, "right")#create ship from coord list
-                                    shipList.append(newShip)#append new Ship to shipList
-                                    num_ships -= 1 #decrement ship number as one was placed
-                                    #reset cursor position
+                                    cur_ship_image = shipImgs[turn][num_ships-1]                                                        # Get next ship image (Maybe put this out of the loop)
+                                    cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*num_ships)/self._scale))   #scale give ship image by the needed values
+                                                                                                                                        #100 pixels x, 100* ship size as ships are oriented vertically until rotated
+                                    cur_ship_image = pg.transform.rotate(cur_ship_image,90)                                             #rotate ship to match direction chosen
+                                    placed_ship_objects.append(Image(cur_ship_image,cursor.x-(2/self._scale),cursor.y-(2/self._scale))) #add ship image to placed_ship_objects so its drawn
+                                    new_ship_coords = []                                         #create new coords for Ship ship
+                                    for i in range(num_ships):                                   #iterate shipsize times
+                                        new_ship_coords.append((coords[0]+i,coords[1]))          #mark coords of ship using that
+                                    newShip = Ship(new_ship_coords, "right")                     #create ship from coord list and direction
+                                    shipList.append(newShip)                                     #append new Ship to shipList
+                                    num_ships -= 1                                               #decrement ship number as one was placed
+                                                        ## reset cursor position ## (Maybe don't do this? I find it annoying personally)
                                     cursor.x = def_x
                                     cursor.y = def_y
-                                    #reset coords for ship building
-                                    coords = [0,0]
-                                    #no longer placing a ship so no more place prompt
-                                    placePrompt = False
-                                else:#if ship check fails then ship placement collides with other ship
-                                    placePrompt = False #no longer placing a ship because they chose a bad spot maybe
-                                    place_err_ship_flag = True #call error type
-                            else:#if map check fails then ship placement goes off map
-                                placePrompt = False #no longer placing a ship because they chose a bad spot maybe
-                                place_err_flag = True #call error type
-                        else:#if not placing a ship
-                            if coords[0] < 9:#if not one square beyond max
-                                cursor.move_ip((100/self._scale),0)#move right 1 square
-                                coords[0] += 1 #update coords
+                                    coords = [0,0]          #reset coords for ship building
+                                    placePrompt = False     #no longer placing a ship so no more place prompt
+                                else:                           #if ship check fails then ship placement collides with other ship
+                                    placePrompt = False         #no longer placing a ship because they chose a bad spot maybe
+                                    place_err_ship_flag = True  #call error type
+                            else:                               #if map check fails then ship placement goes off map
+                                placePrompt = False             #no longer placing a ship because they chose a bad spot maybe
+                                place_err_flag = True           #call error type
+                        else:                                       #if not placing a ship
+                            if coords[0] < 9:                       #if not at max x coord
+                                cursor.move_ip((100/self._scale),0) #move right 1 square
+                                coords[0] += 1                      #update coords
                             else:
-                                cursor.x = min_x + self._offset #otherwise reset cursor to orginal
-                                coords[0] = 0 #same with coords
-                    elif event.key == pg.K_LEFT:
-                        if placePrompt:#if the placeprompt is on then do ship placement logic
-                            if self.check_ship_v_map("left", num_ships, coords):
+                                cursor.x = def_x     #otherwise reset cursor to orginal
+                                coords[0] = 0                       #same with coords
+
+                    elif event.key == pg.K_LEFT:                                    # If that key was left
+                        if placePrompt:                                             #if the placeprompt is on then do ship placement logic
+                            if self.check_ship_v_map("left", num_ships, coords):    #check ship doesn't go off map or intersect a previsiouly placed ship
                                 if self.check_ship_v_ship("left", num_ships, coords, shipList):
-                                    # curShipSize = num_ships    # If we have 5 ships left, we want the 4th index. 4 left, 3rd index, and so on
-                                    cur_ship_image = shipImgs[turn][num_ships-1]  # Get next ship image
-                                    cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*num_ships)/self._scale)) #scale give ship image by the needed values
-                                    #100 pixels x, 100* ship size as ships are oriented vertically until rotated
-                                    cur_ship_image = pg.transform.rotate(cur_ship_image,-90)#rotate ship to match direction chosen
-                                    placed_ship_objects.append(Image(cur_ship_image,cursor.x-(num_ships * single_square_x)+single_square_x-(2/self._scale),cursor.y-(2/self._scale)))
-                                    new_ship_coords = [] #create new coords for Ship ship
-                                    for i in range(num_ships):#iterate shipsize times
-                                        new_ship_coords.append((coords[0]-i,coords[1]))#mark coords of ship using that
-                                    newShip = Ship(new_ship_coords, "left")#create ship from coord list
-                                    shipList.append(newShip)#append new Ship to shipList
-                                    num_ships -= 1 #decrement ship number as one was placed
-                                    #reset cursor position
+                                    cur_ship_image = shipImgs[turn][num_ships-1]                                                        #identical to above
+                                    cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*num_ships)/self._scale))   # ""
+                                    cur_ship_image = pg.transform.rotate(cur_ship_image,90)                                             # ""
+                                    #place ship left by ship size squares for display reasons, look at dcumentation/ drawships function for details
+                                    placed_ship_objects.append(Image(cur_ship_image,cursor.x-(num_ships * single_square_x)+single_square_x-(2/self._scale),cursor.y-(2/self._scale))) 
+                                    new_ship_coords = []                                #same as above
+                                    for i in range(num_ships):                          # ""
+                                        new_ship_coords.append((coords[0]-i,coords[1])) # have to decrement coord instead of incrementing as going left not right
+                                    newShip = Ship(new_ship_coords, "left")             # same as above but left
+                                    shipList.append(newShip)                            # ""
+                                    num_ships -= 1                                      # ""
+                                                        ## reset cursor position ## (Maybe don't do this? I find it annoying personally)
                                     cursor.x = def_x
                                     cursor.y = def_y
-                                    #reset coords for ship building
-                                    coords = [0,0]
-                                    #no longer placing a ship so no more place prompt
-                                    placePrompt = False
-                                else:#if ship check fails then ship placement collides with other ship
-                                    placePrompt = False #no longer placing a ship because they chose a bad spot maybe
-                                    place_err_ship_flag = True #call error type
-                            else:#if map check fails then ship placement goes off map
-                                placePrompt = False #no longer placing a ship because they chose a bad spot maybe
-                                place_err_flag = True #call error type
-                        else:#if not placing a ship
-                            if coords[0] > 0:#if not one square beyond max
-                                cursor.move_ip(-(100/self._scale),0)#move right 1 square
-                                coords[0] -= 1 #update coords
+                                    coords = [0,0]          #reset coords for ship building
+                                    placePrompt = False     #no longer placing a ship so no more place prompt
+
+                                else:                           #if ship check fails then ship placement collides with other ship
+                                    placePrompt = False         #no longer placing a ship because they chose a bad spot maybe
+                                    place_err_ship_flag = True  #call error type
+                            else:                               #if map check fails then ship placement goes off map
+                                placePrompt = False             #no longer placing a ship because they chose a bad spot maybe
+                                place_err_flag = True           #call error type
+                        else:                                       #if not placing a ship
+                            if coords[0] > 0:                       #if not on first square
+                                cursor.move_ip(-(100/self._scale),0)#move left 1 square
+                                coords[0] -= 1                      #update coords
                             else:
-                                cursor.x = max_x #otherwise reset cursor to orginal
-                                coords[0] = 9 #same with coords
-                    elif event.key == pg.K_DOWN:
-                        if placePrompt:#if the placeprompt is on then do ship placement logic
-                            if self.check_ship_v_map("down", num_ships, coords):
+                                cursor.x = max_x                    #otherwise set cursor to max
+                                coords[0] = 9                       #same with coords
+
+                    elif event.key == pg.K_DOWN:                                        # If that key was down
+                        if placePrompt:                                                 # If the placeprompt is on then do ship placement logic
+                            if self.check_ship_v_map("down", num_ships, coords):        #check ship doesn't go off map or intersect a previsiouly placed ship
                                 if self.check_ship_v_ship("down", num_ships, coords, shipList):
-                                    # curShipSize = num_ships    # If we have 5 ships left, we want the 4th index. 4 left, 3rd index, and so on
-                                    cur_ship_image = shipImgs[turn][num_ships-1]  # Get next ship image
-                                    cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*num_ships)/self._scale)) #scale give ship image by the needed values
-                                    #100 pixels x, 100* ship size as ships are oriented vertically until rotated
-                                    placed_ship_objects.append(Image(cur_ship_image,cursor.x-(2/self._scale),cursor.y-(2/self._scale)))#add ship image to placed_ship_objects so its drawn
-                                    new_ship_coords = [] #create new coords for Ship ship
-                                    for i in range(num_ships):#iterate shipsize times
-                                        new_ship_coords.append((coords[0],coords[1]+i))#mark coords of ship using that
-                                    newShip = Ship(new_ship_coords, "down")#create ship from coord list
-                                    shipList.append(newShip)#append new Ship to shipList
-                                    num_ships -= 1 #decrement ship number as one was placed
-                                    #reset cursor position
+                                    cur_ship_image = shipImgs[turn][num_ships-1]                                                        # Get next ship image
+                                    cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*num_ships)/self._scale))   #scale give ship image by the needed values
+                                                                                                                                        #100 pixels x, 100* ship size as ships are oriented vertically until rotated
+                                    placed_ship_objects.append(Image(cur_ship_image,cursor.x-(2/self._scale),cursor.y-(2/self._scale))) #add ship image to placed_ship_objects so its drawn
+                                    new_ship_coords = []                                #create new coords for Ship ship
+                                    for i in range(num_ships):                          #iterate shipsize times
+                                        new_ship_coords.append((coords[0],coords[1]+i)) #mark coords of ship using that, iterating y coords
+                                    newShip = Ship(new_ship_coords, "down")             #create ship from coord list
+                                    shipList.append(newShip)                            #append new Ship to shipList
+                                    num_ships -= 1                                      #decrement ship number as one was placed
+                                                        ## reset cursor position ## (Maybe don't do this? I find it annoying personally)
                                     cursor.x = def_x
                                     cursor.y = def_y
-                                    #reset coords for ship building
-                                    coords = [0,0]
-                                    #no longer placing a ship so no more place prompt
-                                    placePrompt = False
-                                else:#if ship check fails then ship placement collides with other ship
-                                    placePrompt = False #no longer placing a ship because they chose a bad spot maybe
-                                    place_err_ship_flag = True #call error type
-                            else:#if map check fails then ship placement goes off map
-                                placePrompt = False #no longer placing a ship because they chose a bad spot maybe
-                                place_err_flag = True #call error type
-                        else:#if not placing a ship
-                            if coords[1] < 9:#if not one square beyond max
-                                cursor.move_ip(0,(100/self._scale))#move right 1 square
-                                coords[1] += 1 #update coords
+                                    coords = [0,0]          #reset coords for ship building
+                                    placePrompt = False     #no longer placing a ship so no more place prompt
+
+                                else:                           #if ship check fails then ship placement collides with other ship
+                                    placePrompt = False         #no longer placing a ship because they chose a bad spot maybe
+                                    place_err_ship_flag = True  #call error type
+                            else:                               #if map check fails then ship placement goes off map
+                                placePrompt = False             #no longer placing a ship because they chose a bad spot maybe
+                                place_err_flag = True           #call error type
+                        else:                                       #if not placing a ship
+                            if coords[1] < 9:                       #if not at max y
+                                cursor.move_ip(0,(100/self._scale)) #move right 1 down
+                                coords[1] += 1                      #update coords
                             else:
-                                cursor.y = min_y + self._offset #otherwise reset cursor to orginal
-                                coords[1] = 0 #same with coords
-                    elif event.key == pg.K_UP:
-                        if placePrompt:#if the placeprompt is on then do ship placement logic
-                            if self.check_ship_v_map("up", num_ships, coords):
+                                cursor.y = def_y                    #otherwise reset cursor to orginal
+                                coords[1] = 0                       #same with coords
+
+                    elif event.key == pg.K_UP:                                          # If that key was down
+                        if placePrompt:                                                 # If the placeprompt is on then do ship placement logic
+                            if self.check_ship_v_map("up", num_ships, coords):          #check ship doesn't go off map or intersect a previsiouly placed ship
                                 if self.check_ship_v_ship("up", num_ships, coords, shipList):
-                                    # curShipSize = num_ships    # If we have 5 ships left, we want the 4th index. 4 left, 3rd index, and so on
-                                    cur_ship_image = shipImgs[turn][num_ships-1]  # Get next ship image
-                                    cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*num_ships)/self._scale)) #scale give ship image by the needed values
-                                    #100 pixels x, 100* ship size as ships are oriented vertically until rotated
-                                    #cur_ship_image = pg.transform.rotate(cur_ship_image,180)#rotate ship to match direction chosen
+                                    cur_ship_image = shipImgs[turn][num_ships-1]                                                        # Get next ship image
+                                    cur_ship_image = pg.transform.scale(cur_ship_image,(100/self._scale,(100*num_ships)/self._scale))   #scale give ship image by the needed values
+                                                                                                                                        #100 pixels x, 100* ship size as ships are oriented vertically until rotated
                                     placed_ship_objects.append(Image(cur_ship_image,cursor.x-(2/self._scale),cursor.y-num_ships * single_square_y + single_square_y - (2/self._scale)))
-                                    new_ship_coords = [] #create new coords for Ship ship
-                                    for i in range(num_ships):#iterate shipsize times
-                                        new_ship_coords.append((coords[0],coords[1]-i))#mark coords of ship using that
-                                    newShip = Ship(new_ship_coords, "up")#create ship from coord list
-                                    shipList.append(newShip)#append new Ship to shipList
-                                    num_ships -= 1 #decrement ship number as one was placed
-                                    #reset cursor position
+                                    new_ship_coords = []                                    #create new coords for Ship ship
+                                    for i in range(num_ships):                              #iterate shipsize times
+                                        new_ship_coords.append((coords[0],coords[1]-i))     #mark coords of ship using that
+                                    newShip = Ship(new_ship_coords, "up")                   #create ship from coord list
+                                    shipList.append(newShip)                                #append new Ship to shipList
+                                    num_ships -= 1                                          #decrement ship number as one was placed
+                                                        ## reset cursor position ## (Maybe don't do this? I find it annoying personally)
                                     cursor.x = def_x
                                     cursor.y = def_y
-                                    #reset coords for ship building
-                                    coords = [0,0]
-                                    #no longer placing a ship so no more place prompt
-                                    placePrompt = False
-                                else:#if ship check fails then ship placement collides with other ship
-                                    placePrompt = False #no longer placing a ship because they chose a bad spot maybe
-                                    place_err_ship_flag = True #call error type
-                            else:#if map check fails then ship placement goes off map
-                                placePrompt = False #no longer placing a ship because they chose a bad spot maybe
-                                place_err_flag = True #call error type
-                        else:#if not placing a ship
-                            if coords[1] > 0:#if not one square beyond max
-                                cursor.move_ip(0,-(100/self._scale))#move right 1 square
-                                coords[1] -= 1 #update coords
+                                    coords = [0,0]          #reset coords for ship building
+                                    placePrompt = False     #no longer placing a ship so no more place prompt
+
+                                else:                           #if ship check fails then ship placement collides with other ship
+                                    placePrompt = False         #no longer placing a ship because they chose a bad spot maybe
+                                    place_err_ship_flag = True  #call error type
+                            else:                               #if map check fails then ship placement goes off map
+                                placePrompt = False             #no longer placing a ship because they chose a bad spot maybe
+                                place_err_flag = True           #call error type
+                        else:                                       #if not placing a ship
+                            if coords[1] > 0:                           #if not at square 0
+                                cursor.move_ip(0,-(100/self._scale))    #move up 1 square
+                                coords[1] -= 1                          #update coords
                             else:
-                                cursor.y = max_y #otherwise reset cursor to orginal
-                                coords[1] = 9 #same with coords
-                    elif event.key == pg.K_RETURN:#press the enter key
+                                cursor.y = max_y                        #otherwise go to bottom
+                                coords[1] = 9                           #same with coords
+
+                    elif event.key == pg.K_RETURN:  #If enter key is pressed then remove error flags and start placement logic
                         placePrompt = True
                         place_err_flag = False
                         place_err_ship_flag = False
-            if num_ships == 0:
-                allPlaced = True
-        return shipList
+            if num_ships == 0: #once num_ships = 0, then all have been palced
+                allPlaced = True #stop loop
+        
+        self._screen.fill("white")                                                      # set background color
+        self._screen.blit(background, (0, 0))                                           # Display the boards
+        pg.draw.rect(self._screen, 'red', cursor)                                       # Create cursor image
+        self._screen.blit(placed, ((self._width/2)/self._scale,max_y+(100/self._scale))) #Display text saying all ships have been placed
+        pg.display.update() #update display with new text
+        pg.time.wait(1000)  #pause for a second for player to read
+        return shipList     # Return the created ship list for constructor use
 
 
 
 
     def run(self):
-        pg.init()
+        pg.init() # Initialize pygame, lets events be detected
         '''
         -------------------------------------------------------------------------------------------
         Local Variables
         -------------------------------------------------------------------------------------------
         '''
         running       = True                                    # boolean for running the game loop
-
-        welcomeScreen = pg.image.load(os.path.join('assets', 'WelcomeScreen.png'))      # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
+            ### Getting images for game loop ####
+        welcomeScreen = pg.image.load(os.path.join('assets', 'WelcomeScreen.png'))      # loading and scaling welcome screen image
         welcomeScreen = pg.transform.scale(welcomeScreen, (self._width/self._scale, self._height/self._scale))
-        background    = pg.image.load(os.path.join('assets', 'LabeledBackground.png'))  # PHOTO HAS BEEN UPDATED WITH LABELS AND NEW SIZE
+        background    = pg.image.load(os.path.join('assets', 'LabeledBackground.png'))  # Loading and scaling background image
         background    = pg.transform.scale(background, (self._width/self._scale, self._height/self._scale))
-        passToP0      = pg.image.load(os.path.join('assets', 'PassToP0.png'))           # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
+        passToP0      = pg.image.load(os.path.join('assets', 'PassToP0.png'))           # Loading and scaling swap to p0 (red player) image
         passToP0      = pg.transform.scale(passToP0, (self._width/self._scale, self._height/self._scale))
-        passToP1      = pg.image.load(os.path.join('assets', 'PassToP1.png'))           # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
+        passToP1      = pg.image.load(os.path.join('assets', 'PassToP1.png'))           # Loading and scaling swap to p1 (green player) image
         passToP1      = pg.transform.scale(passToP1, (self._width/self._scale, self._height/self._scale))
-        winScreen     = [pg.image.load(os.path.join('assets', 'RedWinScreen.png')),     # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
-                         pg.image.load(os.path.join('assets', 'GreenWinScreen.png'))]    # PHOTO NOT YET ADDED #####TEMP PHOTOS ADDED TO MAKE TOPLEVEL WORK#######
+        winScreen     = [pg.image.load(os.path.join('assets', 'RedWinScreen.png')),     # Loading and scaling win screens
+                         pg.image.load(os.path.join('assets', 'GreenWinScreen.png'))]   
         winScreen     = [pg.transform.scale(winScreen[0], (self._width/self._scale, self._height/self._scale)),
                          pg.transform.scale(winScreen[1], (self._width/self._scale, self._height/self._scale))]
         '''
@@ -566,7 +571,7 @@ class PyGameLoop:
         gamePhase        = 0                                     # initializes to 0 for the intro screen
         passingScreen    = False                                 # bool check to see if passing screen should overlay
         winner           = 2                                     # initializes to 2 to show no winner
-        chosen_num_ships = 1                                     # default value to test
+        chosen_num_ships = 1                                     # default value for testing if skipping intro screen
         max_y            = (self._height-100)/self._scale        # sets max y height of window
 
         '''
@@ -575,7 +580,7 @@ class PyGameLoop:
         -------------------------------------------------------------------------------------------
         '''
         while (running):                                        # continuous game loop
-            self._screen.fill("white")#set background color
+            self._screen.fill("white")                              # set background color
             if (passingScreen):                                     # displays passing screen                
                 if (gamePhase == 1 or (self._battleship.turn == 0 and gamePhase == 3)):        # displays pass to PlayerZero screen if in placement phase or their turn in shooting phase
                     self._screen.blit(passToP0, (0, 0))
@@ -593,8 +598,8 @@ class PyGameLoop:
                 -----------------------------------------------------------------------------------
                 '''
                 while (gamePhase == 0):                                 # intro screen loop
-                    self._screen.blit(welcomeScreen, (0, 0))
-                    pg.display.flip()
+                    self._screen.blit(welcomeScreen, (0, 0))            #display welcome screen
+                    pg.display.flip()                                   #update display
                     for event in pg.event.get():                                            # waits for keyboard event
                         if (event.type == pg.KEYDOWN):
                             if (event.key == pg.K_1):                                       # checks for 1 keypress
@@ -629,9 +634,9 @@ class PyGameLoop:
                 while (gamePhase == 1):                                 # PlayerZero ship placement screen (CAN PROBABLY MAKE THE PLACEMENT PHASES A FUNCTION TO CALL FOR GIVEN PLAYER)
                     self._screen.blit(background, (0, 0))                   # displays game background containing both boards
                     pg.display.flip()                                       # updates the game window
-                    p0_ship_list = self._placeShips(0, chosen_num_ships)
-                    gamePhase = 2
-                    passingScreen = True
+                    p0_ship_list = self._placeShips(0, chosen_num_ships)    #Create temp ship list to construct battlship with later
+                    gamePhase = 2                                           #update gamephase
+                    passingScreen = True                                    #start passing screen
 
                 if (passingScreen):                                     # checks if passingScreen needs to display
                     continue                                                # continues to force the passing screen to display
@@ -644,10 +649,10 @@ class PyGameLoop:
                 while (gamePhase == 2):                                 # PlayerZero ship placement screen (CAN PROBABLY MAKE THE PLACEMENT PHASES A FUNCTION TO CALL FOR GIVEN PLAYER)
                     self._screen.blit(background, (0, 0))                   # displays game background containing both boards
                     pg.display.flip()                                       # updates the game window
-                    p1_ship_list = self._placeShips(1,chosen_num_ships)
-                    gamePhase = 3
-                    self._battleship = Battleship(p0_ship_list,p1_ship_list)             # Create battleship proper
-                    passingScreen = True
+                    p1_ship_list = self._placeShips(1,chosen_num_ships)     #Create temp ship list to construct battlship with later
+                    gamePhase = 3                                           #update gamephase
+                    self._battleship = Battleship(p0_ship_list,p1_ship_list)# Create battleship properly
+                    passingScreen = True                                    #start passing screen
 
                 if (passingScreen):                                     # checks if passingScreen needs to display
                     continue                                                # continues to force the passing screen to display
@@ -668,7 +673,7 @@ class PyGameLoop:
                             mouse_coords = (pg.mouse.get_pos())
                             coords = self._pixToCoords(mouse_coords,self._battleship.turn)          # gets the coordinates from the mouse position pixels
                             print(f'mouse coords: {mouse_coords}, grid coords: {coords}')
-                            if (-1 in coords):                                      # invalid if either coordinate is negative
+                            if (-1 in coords):                                      # invalid if either coordinate is negative (Should we tell the player?)
                                 continue                                                # goes to the next loop
 
                             winner = self._battleship.takeTurn(coords)              # sends coordinates to Battleship to take turn
@@ -693,7 +698,7 @@ class PyGameLoop:
                             self._screen.blit(text_surface, ((self._width/2)/self._scale,max_y+(100/self._scale)))
                             self._drawShots()                                       # draws updated shots
                             pg.display.flip()                                       # updates the game window
-                            time.sleep(1)                                           # waits for a second to allow the player to see their shot
+                            pg.time.wait(1000)                                      # waits for a second to allow the player to see their shot
 
                             if (winner != 2):                                       # someone has won if a 0 or 1 is returned, no one has one if it is a 2
                                 self._screen.blit(winScreen[winner], (0, 0))            # displays the winner's screen

@@ -7,19 +7,19 @@ Team Members: Aiden Patel, Andrew McFerrin, John Newman, Kai Achen, Landon Pyko
 Author: Andrew McFerrin
 Creation Date: 9-10-2024
 '''
-
+#import board as battship has two baords
 from board import Board
+from ship import Ship #import ship to clarify what gets passed into constructor
 
-class Battleship:                                           #
-    def __init__(self, shipList0, shipList1):        # Init class with board along with where all ships are
-          self.boardZero = Board(shipList0)                 # Positions of all ships for player 1
-          self.boardOne = Board(shipList1)                  # Positions of all ships for player 2
-          self.turn = 0                                     # Initialize the the turn as player 1's turn
-          self._curBoard = self.boardOne                   # Initialize the board for player 1's board
+class Battleship:
+    def __init__(self, shipList0: list[Ship], shipList1: list[Ship]):   # Init class with board along with where all ships are
+          self.boardZero = Board(shipList0)                             # Positions of all ships for player 1
+          self.boardOne = Board(shipList1)                              # Positions of all ships for player 2
+          self.turn = 0                                                 # Initialize the the turn as player 0's turn
+          self._curBoard = self.boardOne                                # Initialize the board for player 1's board as we shoot at the other players board
 
 
     def takeTurn(self, coords):                         # This function is called when a player starts their turn
-        # if self.turn == 0:
         if self._curBoard.shoot(coords):                # Pass the coordinates that were shot at to Board and check if they are valid
             if self._curBoard.allSunk():                    # If so, check if that shot sunk the last ship on the board
                 return self.turn                        # Returns the current player number to indicate the winner

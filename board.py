@@ -14,15 +14,15 @@ Coord integer meanings:
     - 3 = occupied, hit
     - 4 = occupied, sunk
 '''
-from ship import Ship
+from ship import Ship#import ship to clarify constructor
 
 class Board:
-    def __init__(self, shipList):                               # Assumes good inputs
+    def __init__(self, shipList: list[Ship]):                   
         # Board coordinates:
         self.coordsMatrix = []                                  # Declare matrix to hold list of lists of coordinate flags
-        for row in range(10):                                   # 10 rows
+        for _ in range(10):                                     # 10 rows
             tempRow = []                                        # Declare temp row for construction
-            for column in range(10):                            # 10 columns
+            for _ in range(10):                                 # 10 columns
                 tempRow.append(0)                               # Append empty flag
             self.coordsMatrix.append(tempRow)                   # Append row to matrix
 

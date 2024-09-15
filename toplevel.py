@@ -8,14 +8,11 @@ Author: Landon Pyko
 Creation Date: 9-10-2024
 '''
 
-from pygameloop import PyGameLoop
+from pygameloop import PyGameLoop   # import pygame
 
 def main():
-    # Instantiate the pygame class 
-    
-    game = PyGameLoop()
-    game.run()
+    game = PyGameLoop()             # Instantiate the pygame class 
+    game.run()                      # Start the game
 
-
-if __name__ == "__main__":
+if __name__ == "__main__":          # run this file as main
     main()
