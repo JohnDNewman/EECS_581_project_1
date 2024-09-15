@@ -35,19 +35,17 @@ class PyGameLoop:
         Left board is where PlayerZero (Red) places ships
         Right board is where PlayerOne (Green) places ships
         '''
+        self._scale = 2                                                     # Create a scale value to shrink window as most monitors aren't 2158 pixels wide or 1104 pixels tall.
         singleBoardWidth  = 1004                                            # Width of game board from image in pixels
         self._width       = 2 * singleBoardWidth + 50 + 100                 # Total width of screen given boards width and extra pixels for spacing
         self._height      = 1004 + 100                                      # Total Height of screen given boards height and extra pixels for spacing.
-        self._offset      = 4                                               # Offset of the top left corner of the board to the top left corner of the first square (4,4) pixels really but simpler to store 4
+        self._offset      = 4 / self._scale                                 # Offset of the top left corner of the board to the top left corner of the first square (4,4) pixels really but simpler to store 4, scaled
 
         self._battleship  = Battleship([Ship([(0,0)])],[Ship([(0,0)])])     # Initialize the battleship with dummy ships so the attribute exists to be edited later. Convenience
         self._screen      = pg.display.set_mode()                           # initializes the window as default values to be edited later.
         self._display_info = pg.display.Info()                              # Info about the Display, used for debugging in editor
-        self._margin = 200                                                  # Margin of 200 pixels to use for diaplying text and etc
-        self._scale = 2                                                     # Create a scale value to shrink window as most monitors aren't 2158 pixels wide or 1104 pixels tall.
+        self._margin = 200 / self._scale                                    # Margin of 200 pixels to use for diaplying text and etc, scaled
 
-        self._margin /= self._scale                                         # Modify margin and offset by the scaling value
-        self._offset /= self._scale                                         # Modify margin and offset by the scaling value
         self._screen      = pg.display.set_mode(((self._width+self._margin)/self._scale, (self._height+self._margin)/self._scale))     # initializes the window to actual values
 
 
