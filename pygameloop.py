@@ -244,7 +244,9 @@ class PyGameLoop:
         
         if player == 0:
             shipList = self._battleship.boardZero.shipList
-        
+        else:
+            shipList = self._battleship.boardOne.shipList
+
         for ship in shipList:
             cur_ship_image = shipImgs[player][ship.get_length()-1]
             if ship._direction == "right":
