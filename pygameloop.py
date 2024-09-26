@@ -14,6 +14,7 @@ import os                                              # Import os to access ima
 from battleship import Battleship                      # Import Battleship to create battleship
 from ship import Ship                                  # Import Ship to clarify fuction inputs
 from sound import SoundManager                         # Import SoundManager to play sfx
+from animation import AnimationManager                 # Import AnimationManager to use animations
 
 #starts the window in the center of the screen
 os.environ['SDL_VIDEO_CENTERED'] = '1'
@@ -50,6 +51,8 @@ class PyGameLoop:
         self._screen      = pg.display.set_mode(((self._width+self._margin)/self._scale, (self._height+self._margin)/self._scale))     # initializes the window to actual values
 
         self._soundManager = SoundManager()                                 # initialize Sound Manager for sfx
+        self._animationManager = AnimationManager()                         # initialize AnimationManager for animations
+        self._clock = pg.time.Clock()                                       # initialize clock for AnimationManager
 
     #Function to check that ship placement doesn't go off board using coords
     def check_ship_v_map(self, direction, ship_length, coords):
