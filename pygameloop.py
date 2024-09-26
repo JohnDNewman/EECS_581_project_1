@@ -13,6 +13,7 @@ import os                                              # Import os to access ima
 #Importing classes we made
 from battleship import Battleship                      # Import Battleship to create battleship
 from ship import Ship                                  # Import Ship to clarify fuction inputs
+from sound import SoundManager                         # Import SoundManager to play sfx
 
 #starts the window in the center of the screen
 os.environ['SDL_VIDEO_CENTERED'] = '1'
@@ -48,6 +49,7 @@ class PyGameLoop:
 
         self._screen      = pg.display.set_mode(((self._width+self._margin)/self._scale, (self._height+self._margin)/self._scale))     # initializes the window to actual values
 
+        self._soundManager = SoundManager()                                 # initialize Sound Manager for sfx
 
     #Function to check that ship placement doesn't go off board using coords
     def check_ship_v_map(self, direction, ship_length, coords):
@@ -673,8 +675,12 @@ class PyGameLoop:
                             print(f'mouse coords: {mouse_coords}, grid coords: {coords}')
                             if (-1 in coords):                                      # invalid if either coordinate is negative (Should we tell the player?)
                                 continue                                                # goes to the next loop
-
+                                
+                            # count total number of sunk ships of both sides before turn
+                            curShipsSunk = [ship.isSunk() for ship in self._battleship.boardZero.shipList + self._battleship.boardOne.shipList].count(True)
                             winner = self._battleship.takeTurn(coords)              # sends coordinates to Battleship to take turn
+                            # count sunk ships again after turn to see if a new ship has been sunk
+                            newShipSunk = [ship.isSunk() for ship in self._battleship.boardZero.shipList + self._battleship.boardOne.shipList].count(True) > curShipsSunk
 
                             if (winner == 3):                                       # passes if the shot was invalid
                                 continue
@@ -689,9 +695,15 @@ class PyGameLoop:
 
                             font = pg.font.Font(None, 36)                           # set font size to 36 px
                             if shotHit:
-                                text_surface = font.render("Hit!", True, (0,0,0))       # Tell the user the shot hit
+                                if newShipSunk: # special message+sfx for sinking a ship
+                                    text_surface = font.render("Hit! Sunk Ship!", True, (0,0,0))  # Tell the user the shot hit + ship sunk
+                                    self._soundManager.playSink() # play sink.mp3
+                                else: # normal message+sfx for hitting a ship but not sinking it
+                                    text_surface = font.render("Hit!", True, (0,0,0))       # Tell the user the shot hit
+                                    self._soundManager.playHit() # play hit.mp3
                             else:
                                 text_surface = font.render("Miss!", True, (0,0,0))      # Tell the user the shot hit
+                                self._soundManager.playMiss() # play miss.mp3
                             
                             self._screen.blit(text_surface, ((self._width/2)/self._scale,max_y+(100/self._scale)))
                             self._drawShots()                                       # draws updated shots
