@@ -17,21 +17,24 @@ class AnimationManager:
         self.missAnimation = pg.image.load(os.path.join('assets', 'animations','miss.png')).convert_alpha()
         self.sinkAnimation = pg.image.load(os.path.join('assets', 'animations','sink.png')).convert_alpha()
 
-        self.isAnimating = False
-        self.animationStartTime = 0
-        self.animationDuration = 500 # ms
+        self.hitAnimation = pg.transform.scale(self.hitAnimation, (100,100))
+        self.missAnimation = pg.transform.scale(self.missAnimation, (100,100))
+        self.sinkAnimation = pg.transform.scale(self.sinkAnimation, (100,100))
 
-    def playHitAnimation(self, screen, position): # TODO: incorporate into main game loop
-        if not self.isAnimating:
-            self.isAnimating = True
-            self.animationStartTime = pg.time.get_ticks()  # Start time of animation
+        self.currentCoords = (0,0)
+        self.animationType = None
+    
+    def playAnimation(self, screen, mouseCoords, animationType):
+        self.currentCoords = mouseCoords
+        self.animationType = animationType
 
-            elapsedTime = pg.time.get_ticks() - self.animationStartTime
+        position = (self.currentCoords[0] - 50, self.currentCoords[1] - 50)
 
+        if self.animationType == 'hit':
             screen.blit(self.hitAnimation, position)
-            
-            if elapsedTime > self.animationDuration:
-                self.isAnimating = False
-
-
-
+        elif self.animationType == 'miss':
+            screen.blit(self.missAnimation, position)
+        elif self.animationType == 'sink':
+            screen.blit(self.sinkAnimation, position)
+        else:
+            print(f"Unrecognized animation type '{self.animationType}'")

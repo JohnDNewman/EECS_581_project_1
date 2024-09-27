@@ -701,17 +701,19 @@ class PyGameLoop:
                                 if newShipSunk: # special message+sfx for sinking a ship
                                     text_surface = font.render("Hit! Sunk Ship!", True, (0,0,0))  # Tell the user the shot hit + ship sunk
                                     self._soundManager.playSink() # play sink.mp3
+                                    self._animationManager.playAnimation(self._screen, mouse_coords, 'sink')
                                 else: # normal message+sfx for hitting a ship but not sinking it
                                     text_surface = font.render("Hit!", True, (0,0,0))       # Tell the user the shot hit
                                     self._soundManager.playHit() # play hit.mp3
+                                    self._animationManager.playAnimation(self._screen, mouse_coords, 'hit')
                             else:
-                                text_surface = font.render("Miss!", True, (0,0,0))      # Tell the user the shot hit
+                                text_surface = font.render("Miss!", True, (0,0,0))      # Tell the user the shot miss
                                 self._soundManager.playMiss() # play miss.mp3
+                                self._animationManager.playAnimation(self._screen, mouse_coords, 'miss')
                             
                             self._screen.blit(text_surface, ((self._width/2)/self._scale,max_y+(100/self._scale)))
-                            self._drawShots()                                       # draws updated shots
-                            pg.display.flip()                                       # updates the game window
-                            pg.time.wait(1000)                                      # waits for a second to allow the player to see their shot
+                            pg.display.flip()
+                            pg.time.wait(2000)
 
                             if (winner != 2):                                       # someone has won if a 0 or 1 is returned, no one has one if it is a 2
                                 self._screen.blit(winScreen[winner], (0, 0))            # displays the winner's screen
