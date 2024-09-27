@@ -10,17 +10,17 @@ Sources:
 '''
 
 class BattleshipAI:
-    def random_place_ship(self):
+    def randomPlaceShip(self):
         pass
 
-    def ai_turn(self):
+    def aiTurn(self):
         pass
 
-    def ai_easy_turn(self):
+    def aiEasyTurn(self):
         pass
 
-    def ai_medium_turn(self):
+    def aiMediumTurn(self):
         pass
 
-    def ai_hard_turn(self):
+    def aiHardTurn(self):
         pass
