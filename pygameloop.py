@@ -52,7 +52,6 @@ class PyGameLoop:
 
         self._soundManager = SoundManager()                                 # initialize Sound Manager for sfx
         self._animationManager = AnimationManager()                         # initialize AnimationManager for animations
-        self._clock = pg.time.Clock()                                       # initialize clock for AnimationManager
 
     #Function to check that ship placement doesn't go off board using coords
     def check_ship_v_map(self, direction, ship_length, coords):
