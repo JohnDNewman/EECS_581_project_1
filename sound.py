@@ -19,7 +19,6 @@ class SoundManager:
         self.hitSound = pg.mixer.Sound(os.path.join('assets', 'sfx', 'hit.mp3'))
         self.missSound = pg.mixer.Sound(os.path.join('assets', 'sfx', 'miss.mp3'))
         self.sinkSound = pg.mixer.Sound(os.path.join('assets', 'sfx', 'sink.mp3'))
-        # self.music = pygame.mixer.music.load('music.mp3')
 
     # Input: None
     # Output: Play hit.mp3 sound effect
