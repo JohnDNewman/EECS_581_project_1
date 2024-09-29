@@ -16,8 +16,8 @@ class BattleshipAI:
         self.board = board
         self.difficulty = difficulty
 
+    # should return a list of Ship objects, which can be passed to the setup phase in run() (line ~719 pygameloop.py)
     def randomPlaceShip(self):
-        # how
         for ship in self.board.shipList:
             placed = False
             while not placed:
@@ -51,11 +51,9 @@ class BattleshipAI:
 
     def aiEasyTurn(self, board):
         coords = (random.randint(0, 9), random.randint(0, 9))                   # creates a random coordinate tuple within bounds
-        print(coords)
         valid_spaces = [0, 2]                                                   # 0: unhit and empty, 2: unhit and occupied
         while board.coordsMatrix[coords[0]][coords[1]] not in valid_spaces:     # checks if the current coords is in an unhit space
             coords = (random.randint(0, 9), random.randint(0, 9))               # generates a new random tuple
-            print(coords)
         return coords
 
     # AI turns should return a coordinate tuple

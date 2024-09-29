@@ -716,6 +716,7 @@ class PyGameLoop:
                 while (gamePhase == 2):                                 # PlayerZero ship placement screen (CAN PROBABLY MAKE THE PLACEMENT PHASES A FUNCTION TO CALL FOR GIVEN PLAYER)
                     self._screen.blit(background, (0, 0))                   # displays game background containing both boards
                     pg.display.flip()                                       # updates the game window
+                    # randomPlaceShips can be used here to create the AI's board and then sent to Battleship
                     p1_ship_list = self._placeShips(1,chosen_num_ships)     #Create temp ship list to construct battlship with later
                     gamePhase = 3                                           #update gamephase
                     self._battleship = Battleship(p0_ship_list,p1_ship_list)# Create battleship properly
