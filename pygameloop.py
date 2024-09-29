@@ -4,6 +4,7 @@ Description: PyGameLoop class that stores all the logic for visualizing and runn
 Inputs: User input through mouse clicks and key presses
 Outputs: Visualized game
 Team Members: Aiden Patel, Andrew McFerrin, John Newman, Kai Achen, Landon Pyko
+Project 2 Contributors: Isabel Loney, Anakha Krishna, Ginny Ke, Jackson Wunderlich, Dylan Sailors
 Author: Aiden Patel, Landon Pyko, John Newman
 Creation Date: 9-10-2024
 '''
@@ -769,19 +770,19 @@ class PyGameLoop:
                                     if newShipSunk: # special message+sfx for sinking a ship
                                         text_surface = font.render("Hit! Sunk Ship!", True, (0,0,0))  # Tell the user the shot hit + ship sunk
                                         self._soundManager.playSink() # play sink.mp3
-                                        self._animationManager.playAnimation(self._screen, mouse_coords, 'sink')
+                                        self._animationManager.playAnimation(self._screen, mouse_coords, 'sink') # display sink animation at click site
                                     else: # normal message+sfx for hitting a ship but not sinking it
                                         text_surface = font.render("Hit!", True, (0,0,0))       # Tell the user the shot hit
                                         self._soundManager.playHit() # play hit.mp3
-                                        self._animationManager.playAnimation(self._screen, mouse_coords, 'hit')
+                                        self._animationManager.playAnimation(self._screen, mouse_coords, 'hit') # display hit animation at click site
                                 else:
                                     text_surface = font.render("Miss!", True, (0,0,0))      # Tell the user the shot miss
                                     self._soundManager.playMiss() # play miss.mp3
-                                    self._animationManager.playAnimation(self._screen, mouse_coords, 'miss')
+                                    self._animationManager.playAnimation(self._screen, mouse_coords, 'miss') # display miss animation at click site
                                 
-                                self._screen.blit(text_surface, ((self._width/2)/self._scale,max_y+(100/self._scale)))
-                                pg.display.flip()
-                                pg.time.wait(2000)
+                                self._screen.blit(text_surface, ((self._width/2)/self._scale,max_y+(100/self._scale))) # print text with corresponding action
+                                pg.display.flip() # refresh board
+                                pg.time.wait(2000) # allow user to see their move
 
                                 if (winner != 2):                                       # someone has won if a 0 or 1 is returned, no one has one if it is a 2
                                     self._screen.blit(winScreen[winner], (0, 0))            # displays the winner's screen
