@@ -55,6 +55,8 @@ class PyGameLoop:
         self._soundManager = SoundManager()                                 # initialize Sound Manager for sfx
         self._animationManager = AnimationManager()                         # initialize AnimationManager for animations
 
+        self._battleshipAI = None                                           # initialize dummy battleship AI variable
+
     def _main_menu(self):
         #Displays a main menu that allows the player to choose between 2 players or AI.
         pg.init()
@@ -97,14 +99,7 @@ class PyGameLoop:
                     elif event.key == pg.K_DOWN:  # Move selection down
                         selected_option = (selected_option + 1) % len(options)
                     elif event.key == pg.K_RETURN:  # Confirm selection
-                        if selected_option == 0:
-                            return "2P"  # 2 Players
-                        elif selected_option == 1:
-                            return "AI_easy"  # AI Easy
-                        elif selected_option == 2:
-                            return "AI_medium"  # AI Medium
-                        elif selected_option == 3:
-                            return "AI_hard"  # AI Hard
+                        return selected_option
 
            # clock.tick(30)
 
@@ -800,5 +795,8 @@ class PyGameLoop:
     def main(self):
         # Display menu and get user choice
         game_mode = self._main_menu()
+        if game_mode > 0:
+            # need a shipList to create a Board? idk how to
+            self._battleshipAI = BattleshipAI(None, game_mode) # placeholder for board in BattleshipAI
 
 #will add ai game level connections here later once ai modes are coded

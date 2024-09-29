@@ -10,11 +10,14 @@ Sources:
 '''
 
 import random
+
 class BattleshipAI:
-    def __init__ (self, board): #initialize battleship board 
-        self.board = board 
+    def __init__ (self, board, difficulty): #initialize battleship board 
+        self.board = board
+        self.difficulty = difficulty
 
     def randomPlaceShip(self):
+        # how
         for ship in self.board.shipList:
             placed = False
             while not placed:
@@ -36,8 +39,14 @@ class BattleshipAI:
                     for coord in ship_coordinates:
                         self.board.coordsMatrix[coord[0]][coord[1]] = 2  # Mark as taken
                     placed = True
+    
     def aiTurn(self):
-        pass
+        if self.difficulty == 1:
+            self.aiEasyTurn()
+        elif self.difficulty == 2:
+            self.aiMediumTurn()
+        elif self.difficulty == 3:
+            self.aiHardTurn()
 
     def aiEasyTurn(self):
         pass
