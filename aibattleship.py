@@ -40,17 +40,26 @@ class BattleshipAI:
                         self.board.coordsMatrix[coord[0]][coord[1]] = 2  # Mark as taken
                     placed = True
     
-    def aiTurn(self):
+    def aiTurn(self, board):
+        # returns coordinates based on difficulty level
         if self.difficulty == 1:
-            self.aiEasyTurn()
+            return self.aiEasyTurn(board)
         elif self.difficulty == 2:
-            self.aiMediumTurn()
+            return self.aiMediumTurn()
         elif self.difficulty == 3:
-            self.aiHardTurn()
+            return self.aiHardTurn()
 
-    def aiEasyTurn(self):
-        pass
+    def aiEasyTurn(self, board):
+        coords = (random.randint(0, 9), random.randint(0, 9))                   # creates a random coordinate tuple within bounds
+        print(coords)
+        valid_spaces = [0, 2]                                                   # 0: unhit and empty, 2: unhit and occupied
+        while board.coordsMatrix[coords[0]][coords[1]] not in valid_spaces:     # checks if the current coords is in an unhit space
+            coords = (random.randint(0, 9), random.randint(0, 9))               # generates a new random tuple
+            print(coords)
+        return coords
 
+    # AI turns should return a coordinate tuple
+    # passed player's board to aiTurn if you need to use it
     def aiMediumTurn(self):
         pass
 

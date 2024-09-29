@@ -100,7 +100,13 @@ class PyGameLoop:
                     elif event.key == pg.K_DOWN:  # Move selection down
                         selected_option = (selected_option + 1) % len(options)
                     elif event.key == pg.K_RETURN:  # Confirm selection
-                        return selected_option
+                        '''
+                        0: two players
+                        1: easy AI
+                        2: medium AI
+                        3: hard AI
+                        '''
+                        return selected_option      # returns option based on menu selection
 
            # clock.tick(30)
 
@@ -635,12 +641,20 @@ class PyGameLoop:
         while (running):                                        # continuous game loop
             self._screen.fill("white")                              # set background color
             if (passingScreen):                                     # displays passing screen                
-                if (gamePhase == 1 or (self._battleship.turn == 0 and gamePhase == 3)):        # displays pass to PlayerZero screen if in placement phase or their turn in shooting phase
+                if (gamePhase == 1 or (self._battleship.turn == 0 and gamePhase == 3) and not self._usingAI):   # displays pass to PlayerZero screen if in placement phase or their turn in shooting phase
                     self._screen.blit(passToP0, (0, 0))
-                else:                                                   # displays pass to PlayerOne screen if in placement phase or their turn
+                elif not self._usingAI:                                                                         # displays pass to PlayerOne screen if in placement phase or their turn
                     self._screen.blit(passToP1, (0, 0))
+                else:
+                    font = pg.font.Font(None, 56)                                                               # creates a size 56 font
+                    text = font.render("AI turn!", True, (0, 0, 0))                                             # creates text for the AI turn
+                    self._screen.blit(text, (((self._width/2)-100)/self._scale, (self._height/2)/self._scale))  # adds text to screen
+                    pg.display.flip()                                                                           # updates the game window
+                    pg.time.wait(1000)
                 pg.display.flip()                                       # updates the game window
-                for event in pg.event.get():                            # tracking for some sort of event to get out of passing screen NOT WORKING RIGHT NOW
+                if self._usingAI:                                       # if playing against AI, automatically skip "pass to player" screens
+                    passingScreen = False
+                for event in pg.event.get():                            # tracking for some sort of event to get out of passing screen
                     if (event.type == pg.KEYDOWN or event.type == pg.MOUSEBUTTONDOWN):
                         passingScreen = False
 
@@ -722,6 +736,7 @@ class PyGameLoop:
                     pg.display.flip()                                       # updates the game window
 
                     # checks if not playing against AI or if it is the player's turn
+                    # if so, use the wait for mouse
                     if not self._usingAI or self._battleship.turn == 0:
                         for event in pg.event.get():                            # waits for mouse event
                             if (event.type == pg.MOUSEBUTTONDOWN):              # if event is mouse button down
@@ -774,8 +789,18 @@ class PyGameLoop:
                                 else:
                                     passingScreen = True                                    # sets passing screen flag for end of turn
                     else:
-                        pass
-                        # using aiTurn should go here
+                        # count total number of sunk ships of both sides before turn
+                        coords = self._battleshipAI.aiTurn(self._battleship.boardZero) # generate a set of coordinates for attack based on difficulty
+                        curShipsSunk = [ship.isSunk() for ship in self._battleship.boardZero.shipList + self._battleship.boardOne.shipList].count(True)
+                        winner = self._battleship.takeTurn(coords)              # sends coordinates to Battleship to take turn
+                        # count sunk ships again after turn to see if a new ship has been sunk
+                        newShipSunk = [ship.isSunk() for ship in self._battleship.boardZero.shipList + self._battleship.boardOne.shipList].count(True) > curShipsSunk
+
+                        if (winner != 2):                                       # someone has won if a 0 or 1 is returned, no one has one if it is a 2
+                            self._screen.blit(winScreen[winner], (0, 0))            # displays the winner's screen
+                            gamePhase = 4
+                        else:
+                            passingScreen = True                                    # sets passing screen flag for end of turn
 
                     if passingScreen:                                       # breaks loop to enter passing screen
                         break
@@ -802,9 +827,6 @@ class PyGameLoop:
         # Display menu and get user choice
         game_mode = self._main_menu()
         print(game_mode)
-        if game_mode > 0:
-            # need a shipList to create a Board? idk how to
+        if game_mode > 0:                                      # checks if gamemode is not two-player
             self._battleshipAI = BattleshipAI(None, game_mode) # placeholder for board in BattleshipAI
-            self._usingAI = True
-
-#will add ai game level connections here later once ai modes are coded
+            self._usingAI = True                               # marks that AI is a player
