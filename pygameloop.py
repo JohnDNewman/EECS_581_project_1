@@ -56,6 +56,7 @@ class PyGameLoop:
         self._animationManager = AnimationManager()                         # initialize AnimationManager for animations
 
         self._battleshipAI = None                                           # initialize dummy battleship AI variable
+        self._usingAI = False                                               # initializes indicator for playing against AI
 
     def _main_menu(self):
         #Displays a main menu that allows the player to choose between 2 players or AI.
@@ -720,56 +721,61 @@ class PyGameLoop:
                     self._drawShots()                                       # draws shots on each board
                     pg.display.flip()                                       # updates the game window
 
-                    for event in pg.event.get():                            # waits for mouse event
-                        if (event.type == pg.MOUSEBUTTONDOWN):              # if event is mouse button down
-                            mouse_coords = (pg.mouse.get_pos())
-                            coords = self._pixToCoords(mouse_coords,self._battleship.turn)          # gets the coordinates from the mouse position pixels
-                            print(f'mouse coords: {mouse_coords}, grid coords: {coords}')
-                            if (-1 in coords):                                      # invalid if either coordinate is negative (Should we tell the player?)
-                                continue                                                # goes to the next loop
+                    # checks if not playing against AI or if it is the player's turn
+                    if not self._usingAI or self._battleship.turn == 0:
+                        for event in pg.event.get():                            # waits for mouse event
+                            if (event.type == pg.MOUSEBUTTONDOWN):              # if event is mouse button down
+                                mouse_coords = (pg.mouse.get_pos())
+                                coords = self._pixToCoords(mouse_coords,self._battleship.turn)          # gets the coordinates from the mouse position pixels
+                                print(f'mouse coords: {mouse_coords}, grid coords: {coords}')
+                                if (-1 in coords):                                      # invalid if either coordinate is negative (Should we tell the player?)
+                                    continue                                                # goes to the next loop
+                                    
+                                # count total number of sunk ships of both sides before turn
+                                curShipsSunk = [ship.isSunk() for ship in self._battleship.boardZero.shipList + self._battleship.boardOne.shipList].count(True)
+                                winner = self._battleship.takeTurn(coords)              # sends coordinates to Battleship to take turn
+                                # count sunk ships again after turn to see if a new ship has been sunk
+                                newShipSunk = [ship.isSunk() for ship in self._battleship.boardZero.shipList + self._battleship.boardOne.shipList].count(True) > curShipsSunk
+
+                                if (winner == 3):                                       # passes if the shot was invalid
+                                    continue
                                 
-                            # count total number of sunk ships of both sides before turn
-                            curShipsSunk = [ship.isSunk() for ship in self._battleship.boardZero.shipList + self._battleship.boardOne.shipList].count(True)
-                            winner = self._battleship.takeTurn(coords)              # sends coordinates to Battleship to take turn
-                            # count sunk ships again after turn to see if a new ship has been sunk
-                            newShipSunk = [ship.isSunk() for ship in self._battleship.boardZero.shipList + self._battleship.boardOne.shipList].count(True) > curShipsSunk
+                                shotHit = False                                         # default value assuming shot missed
+                                if (self._battleship.turn == 0):                        # checks if turn is set to 0
+                                    if self._battleship.boardZero.coordsMatrix[coords[0]][coords[1]] != 1:  # checks boardZero value at coord
+                                        shotHit = True                                                          # sets to true if shot was not a miss
+                                else:                                                   # if turn is set to 1
+                                    if self._battleship.boardOne.coordsMatrix[coords[0]][coords[1]] != 1:   # checks boardOne value at coord
+                                        shotHit = True                                                          # sets to true if shot was not a miss
 
-                            if (winner == 3):                                       # passes if the shot was invalid
-                                continue
-                            
-                            shotHit = False                                         # default value assuming shot missed
-                            if (self._battleship.turn == 0):                        # checks if turn is set to 0
-                                if self._battleship.boardZero.coordsMatrix[coords[0]][coords[1]] != 1:  # checks boardZero value at coord
-                                    shotHit = True                                                          # sets to true if shot was not a miss
-                            else:                                                   # if turn is set to 1
-                                if self._battleship.boardOne.coordsMatrix[coords[0]][coords[1]] != 1:   # checks boardOne value at coord
-                                    shotHit = True                                                          # sets to true if shot was not a miss
+                                font = pg.font.Font(None, 36)                           # set font size to 36 px
+                                if shotHit:
+                                    if newShipSunk: # special message+sfx for sinking a ship
+                                        text_surface = font.render("Hit! Sunk Ship!", True, (0,0,0))  # Tell the user the shot hit + ship sunk
+                                        self._soundManager.playSink() # play sink.mp3
+                                        self._animationManager.playAnimation(self._screen, mouse_coords, 'sink')
+                                    else: # normal message+sfx for hitting a ship but not sinking it
+                                        text_surface = font.render("Hit!", True, (0,0,0))       # Tell the user the shot hit
+                                        self._soundManager.playHit() # play hit.mp3
+                                        self._animationManager.playAnimation(self._screen, mouse_coords, 'hit')
+                                else:
+                                    text_surface = font.render("Miss!", True, (0,0,0))      # Tell the user the shot miss
+                                    self._soundManager.playMiss() # play miss.mp3
+                                    self._animationManager.playAnimation(self._screen, mouse_coords, 'miss')
+                                
+                                self._screen.blit(text_surface, ((self._width/2)/self._scale,max_y+(100/self._scale)))
+                                pg.display.flip()
+                                pg.time.wait(2000)
 
-                            font = pg.font.Font(None, 36)                           # set font size to 36 px
-                            if shotHit:
-                                if newShipSunk: # special message+sfx for sinking a ship
-                                    text_surface = font.render("Hit! Sunk Ship!", True, (0,0,0))  # Tell the user the shot hit + ship sunk
-                                    self._soundManager.playSink() # play sink.mp3
-                                    self._animationManager.playAnimation(self._screen, mouse_coords, 'sink')
-                                else: # normal message+sfx for hitting a ship but not sinking it
-                                    text_surface = font.render("Hit!", True, (0,0,0))       # Tell the user the shot hit
-                                    self._soundManager.playHit() # play hit.mp3
-                                    self._animationManager.playAnimation(self._screen, mouse_coords, 'hit')
-                            else:
-                                text_surface = font.render("Miss!", True, (0,0,0))      # Tell the user the shot miss
-                                self._soundManager.playMiss() # play miss.mp3
-                                self._animationManager.playAnimation(self._screen, mouse_coords, 'miss')
-                            
-                            self._screen.blit(text_surface, ((self._width/2)/self._scale,max_y+(100/self._scale)))
-                            pg.display.flip()
-                            pg.time.wait(2000)
+                                if (winner != 2):                                       # someone has won if a 0 or 1 is returned, no one has one if it is a 2
+                                    self._screen.blit(winScreen[winner], (0, 0))            # displays the winner's screen
+                                    gamePhase = 4
 
-                            if (winner != 2):                                       # someone has won if a 0 or 1 is returned, no one has one if it is a 2
-                                self._screen.blit(winScreen[winner], (0, 0))            # displays the winner's screen
-                                gamePhase = 4
-
-                            else:
-                                passingScreen = True                                    # sets passing screen flag for end of turn
+                                else:
+                                    passingScreen = True                                    # sets passing screen flag for end of turn
+                    else:
+                        pass
+                        # using aiTurn should go here
 
                     if passingScreen:                                       # breaks loop to enter passing screen
                         break
@@ -795,8 +801,10 @@ class PyGameLoop:
     def main(self):
         # Display menu and get user choice
         game_mode = self._main_menu()
+        print(game_mode)
         if game_mode > 0:
             # need a shipList to create a Board? idk how to
             self._battleshipAI = BattleshipAI(None, game_mode) # placeholder for board in BattleshipAI
+            self._usingAI = True
 
 #will add ai game level connections here later once ai modes are coded
