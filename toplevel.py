@@ -12,6 +12,7 @@ from pygameloop import PyGameLoop   # import pygame
 
 def main():
     game = PyGameLoop()             # Instantiate the pygame class 
+    game.main()                     # Shows User Menu
     game.run()                      # Start the game
 
 if __name__ == "__main__":          # run this file as main
