@@ -15,6 +15,8 @@ from battleship import Battleship                      # Import Battleship to cr
 from ship import Ship                                  # Import Ship to clarify fuction inputs
 from sound import SoundManager                         # Import SoundManager to play sfx
 from animation import AnimationManager                 # Import AnimationManager to use animations
+import sys
+from aibattleship import BattleshipAI
 
 #starts the window in the center of the screen
 os.environ['SDL_VIDEO_CENTERED'] = '1'
@@ -52,6 +54,59 @@ class PyGameLoop:
 
         self._soundManager = SoundManager()                                 # initialize Sound Manager for sfx
         self._animationManager = AnimationManager()                         # initialize AnimationManager for animations
+
+    def _main_menu(self):
+        #Displays a main menu that allows the player to choose between 2 players or AI.
+        pg.init()
+        font = pg.font.Font(None, 48)
+        screen = pg.display.set_mode((800, 600))
+        #clock = pg.time.Clock()
+
+        '''code that structures the main menu screen to be the same size as the game screen'''
+        menu_width = (self._width +self._margin)/self._scale
+        menu_height = (self._height +self._margin) / self._scale
+        screen = pg.display.set_mode((int(menu_width), int(menu_height)))
+        
+        #prints the options
+        options = ["2 Players", "Play against AI (Easy)", "Play against AI (Medium)", "Play against AI (Hard)"]
+        selected_option = 0 
+    
+        while True:
+            screen.fill((0, 0, 0)) #blank background
+
+            # Render the menu options
+            for i, option in enumerate(options):
+                if i == selected_option:
+                    label = font.render(option, True, (255, 0, 0))  # Highlight the selected option
+                else:
+                    label = font.render(option, True, (255, 255, 255))  # Normal options
+
+                screen.blit(label, (200, 255 + i * 60)) 
+                #displays menu
+            pg.display.flip()
+
+            # Handle user input
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_UP:  # Move selection up
+                        selected_option = (selected_option - 1) % len(options)
+                    elif event.key == pg.K_DOWN:  # Move selection down
+                        selected_option = (selected_option + 1) % len(options)
+                    elif event.key == pg.K_RETURN:  # Confirm selection
+                        if selected_option == 0:
+                            return "2P"  # 2 Players
+                        elif selected_option == 1:
+                            return "AI_easy"  # AI Easy
+                        elif selected_option == 2:
+                            return "AI_medium"  # AI Medium
+                        elif selected_option == 3:
+                            return "AI_hard"  # AI Hard
+
+           # clock.tick(30)
 
     #Function to check that ship placement doesn't go off board using coords
     def check_ship_v_map(self, direction, ship_length, coords):
@@ -741,3 +796,9 @@ class PyGameLoop:
                             '''
                             gamePhase = 0                                       # reinitializes to 1 for the intro screen
                             winner    = 2                                       # reinitializes to 2 to show no winner
+                            
+    def main(self):
+        # Display menu and get user choice
+        game_mode = self._main_menu()
+
+#will add ai game level connections here later once ai modes are coded
