@@ -16,22 +16,20 @@ from battleship import Battleship                      # Import Battleship to cr
 from ship import Ship                                  # Import Ship to clarify fuction inputs
 from sound import SoundManager                         # Import SoundManager to play sfx
 from animation import AnimationManager                 # Import AnimationManager to use animations
-import sys
-from aibattleship import BattleshipAI
-from board import Board
-from ship import Ship
+import sys                                              #imports
+from aibattleship import BattleshipAI                  #imports ai battleship for levels
+from board import Board                                #imports board function
+from ship import Ship                                  #imports ship 
 
 import random
 
 def create_random_ship_list(num_ships):
-    sizes = [1, 2, 3, 4, 5]  # Possible ship sizes
+    # Create a list of ship sizes based on the number of ships selected
+    sizes = list(range(1, num_ships + 1))  # This will be [1, 2, ..., num_ships]
+    random.shuffle(sizes)  # Shuffle sizes for randomness
     ship_list = []
 
-    # Randomly select sizes for the ships
-    selected_sizes = random.sample(sizes, num_ships)
-
-    for size in selected_sizes:
-        # Placeholder coordinates for the ship (you may want to change this to actual random placements)
+    for size in sizes:
         orientation = random.choice(['horizontal', 'vertical'])
         if orientation == 'horizontal':
             row = random.randint(0, 9)
@@ -45,6 +43,7 @@ def create_random_ship_list(num_ships):
         ship_list.append(Ship(coords, direction=orientation))
 
     return ship_list
+
 
 #starts the window in the center of the screen
 os.environ['SDL_VIDEO_CENTERED'] = '1'
@@ -745,14 +744,36 @@ class PyGameLoop:
                     pg.display.flip()  # updates the game window
 
                     if self._usingAI:
-                        shipList = create_random_ship_list(5)  # Create a random list for AI (adjust as needed)
-                        self._battleshipAI = BattleshipAI(Board(shipList), 1)  # Create an instance of the AI
-                        self._battleshipAI.randomPlaceShip()  # Call the AI method to randomly place ships
-                        p1_ship_list = self._battleshipAI.board.shipList  # Get the AI's ship list after placement
+                        if chosen_num_ships ==1: 
+                            shipList = create_random_ship_list(1)  # Create a random list for AI (adjust as needed)
+                            self._battleshipAI = BattleshipAI(Board(shipList), 1)  # Create an instance of the AI
+                            self._battleshipAI.randomPlaceShip()  # Call the AI method to randomly place ships
+                            p1_ship_list = self._battleshipAI.board.shipList  # Get the AI's ship list after placement
+                        elif chosen_num_ships==2:
+                            shipList = create_random_ship_list(2)  # Create a random list for AI (adjust as needed)
+                            self._battleshipAI = BattleshipAI(Board(shipList), 1)  # Create an instance of the AI
+                            self._battleshipAI.randomPlaceShip()  # Call the AI method to randomly place ships
+                            p1_ship_list = self._battleshipAI.board.shipList  # Get the AI's ship list after placement
+                        elif chosen_num_ships==3:
+                            shipList = create_random_ship_list(3)  # Create a random list for AI (adjust as needed)
+                            self._battleshipAI = BattleshipAI(Board(shipList), 1)  # Create an instance of the AI
+                            self._battleshipAI.randomPlaceShip()  # Call the AI method to randomly place ships
+                            p1_ship_list = self._battleshipAI.board.shipList  # Get the AI's ship list after placement
+                        elif chosen_num_ships==4:
+                            shipList = create_random_ship_list(4)  # Create a random list for AI (adjust as needed)
+                            self._battleshipAI = BattleshipAI(Board(shipList), 1)  # Create an instance of the AI
+                            self._battleshipAI.randomPlaceShip()  # Call the AI method to randomly place ships
+                            p1_ship_list = self._battleshipAI.board.shipList  # Get the AI's ship list after placement
+                        elif chosen_num_ships==5:
+                            shipList = create_random_ship_list(5)  # Create a random list for AI (adjust as needed)
+                            self._battleshipAI = BattleshipAI(Board(shipList), 1)  # Create an instance of the AI
+                            self._battleshipAI.randomPlaceShip()  # Call the AI method to randomly place ships
+                            p1_ship_list = self._battleshipAI.board.shipList  # Get the AI's ship list after placement
                     else:
-                        chosen_num_ships = 2  # Set this based on user input
-                        p1_ship_list = create_random_ship_list(chosen_num_ships)  # Generate random ship list for player 1
+                        #chosen_num_ships = 2  # Set this based on user input
+                        p1_ship_list = self._placeShips(1, chosen_num_ships)  # Generate random ship list for player 1
 
+                    
                     gamePhase = 3  # Update game phase
                     self._battleship = Battleship(p0_ship_list, p1_ship_list)  # Create battleship properly
                     passingScreen = True  # Start passing screen
