@@ -18,6 +18,33 @@ from sound import SoundManager                         # Import SoundManager to 
 from animation import AnimationManager                 # Import AnimationManager to use animations
 import sys
 from aibattleship import BattleshipAI
+from board import Board
+from ship import Ship
+
+import random
+
+def create_random_ship_list(num_ships):
+    sizes = [1, 2, 3, 4, 5]  # Possible ship sizes
+    ship_list = []
+
+    # Randomly select sizes for the ships
+    selected_sizes = random.sample(sizes, num_ships)
+
+    for size in selected_sizes:
+        # Placeholder coordinates for the ship (you may want to change this to actual random placements)
+        orientation = random.choice(['horizontal', 'vertical'])
+        if orientation == 'horizontal':
+            row = random.randint(0, 9)
+            col = random.randint(0, 9 - size)  # Ensure it fits in the row
+            coords = [(row, col + i) for i in range(size)]
+        else:
+            row = random.randint(0, 9 - size)  # Ensure it fits in the column
+            col = random.randint(0, 9)
+            coords = [(row + i, col) for i in range(size)]
+        
+        ship_list.append(Ship(coords, direction=orientation))
+
+    return ship_list
 
 #starts the window in the center of the screen
 os.environ['SDL_VIDEO_CENTERED'] = '1'
@@ -597,8 +624,6 @@ class PyGameLoop:
         return shipList     # Return the created ship list for constructor use
 
 
-
-
     def run(self):
         pg.init() # Initialize pygame, lets events be detected
         '''
@@ -714,14 +739,23 @@ class PyGameLoop:
                 PlayerOne Ship Placement Phase
                 -----------------------------------------------------------------------------------
                 '''
-                while (gamePhase == 2):                                 # PlayerZero ship placement screen (CAN PROBABLY MAKE THE PLACEMENT PHASES A FUNCTION TO CALL FOR GIVEN PLAYER)
-                    self._screen.blit(background, (0, 0))                   # displays game background containing both boards
-                    pg.display.flip()                                       # updates the game window
-                    # randomPlaceShips can be used here to create the AI's board and then sent to Battleship
-                    p1_ship_list = self._placeShips(1,chosen_num_ships)     #Create temp ship list to construct battlship with later
-                    gamePhase = 3                                           #update gamephase
-                    self._battleship = Battleship(p0_ship_list,p1_ship_list)# Create battleship properly
-                    passingScreen = True                                    #start passing screen
+
+                while (gamePhase == 2):
+                    self._screen.blit(background, (0, 0))  # displays game background containing both boards
+                    pg.display.flip()  # updates the game window
+
+                    if self._usingAI:
+                        shipList = create_random_ship_list(5)  # Create a random list for AI (adjust as needed)
+                        self._battleshipAI = BattleshipAI(Board(shipList), 1)  # Create an instance of the AI
+                        self._battleshipAI.randomPlaceShip()  # Call the AI method to randomly place ships
+                        p1_ship_list = self._battleshipAI.board.shipList  # Get the AI's ship list after placement
+                    else:
+                        chosen_num_ships = 2  # Set this based on user input
+                        p1_ship_list = create_random_ship_list(chosen_num_ships)  # Generate random ship list for player 1
+
+                    gamePhase = 3  # Update game phase
+                    self._battleship = Battleship(p0_ship_list, p1_ship_list)  # Create battleship properly
+                    passingScreen = True  # Start passing screen
 
                 if (passingScreen):                                     # checks if passingScreen needs to display
                     continue                                                # continues to force the passing screen to display
