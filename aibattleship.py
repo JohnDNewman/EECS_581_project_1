@@ -10,6 +10,9 @@ Sources: Google, ChatGPT
 '''
 
 import random
+from board import Board
+from ship import Ship
+
 
 class BattleshipAI:
     def __init__ (self, board, difficulty): #initialize battleship board 
@@ -18,28 +21,27 @@ class BattleshipAI:
         self.last_hit = None
         self.possible_targets = []
 
+
     # should return a list of Ship objects, which can be passed to the setup phase in run() (line ~719 pygameloop.py)
     def randomPlaceShip(self):
+        
         for ship in self.board.shipList:
             placed = False
             while not placed:
-                orientation = random.choice(['horizontal', 'vertical'])  # Randomly choose orientation
-
-                # Choose random row and column within bounds to fit the ship
+                orientation = random.choice(['horizontal', 'vertical'])
                 if orientation == 'horizontal':
                     row = random.randint(0, 9)
-                    col = random.randint(0, 9 - ship.size)
-                    ship_coordinates = [(row, col + i) for i in range(ship.size)]
+                    col = random.randint(0, 9 - ship.get_length())
+                    ship_coordinates = [(row, col + i) for i in range(ship.get_length())]
                 else:
-                    row = random.randint(0, 9 - ship.size)
+                    row = random.randint(0, 9 - ship.get_length())
                     col = random.randint(0, 9)
-                    ship_coordinates = [(row + i, col) for i in range(ship.size)]
+                    ship_coordinates = [(row + i, col) for i in range(ship.get_length())]
 
-                # Check if all ship coordinates are valid
                 if all(self.board.coordsMatrix[coord[0]][coord[1]] == 0 for coord in ship_coordinates):
                     ship.coords = ship_coordinates
                     for coord in ship_coordinates:
-                        self.board.coordsMatrix[coord[0]][coord[1]] = 2  # Mark as taken
+                        self.board.coordsMatrix[coord[0]][coord[1]] = 2
                     placed = True
     
     # input: None
