@@ -77,20 +77,29 @@ class BattleshipAI:
     # input: None
     # output: returns the coordinates of a ship to be hit
     def aiMediumTurn(self, board):
-        # if there are potential targets (adjacent cells to a hit), try those first
-        if self.possible_targets:
-            target = self.possible_targets.pop(0) # pops the number received in possible target and makes it a target
-            if board.coordsMatrix[target[0]][target[1]] in [0, 2]:  # indicates valid hit
+        if self.possible_targets: # if there are potential targets (adjacent cells to a hit), try those first
+            target = self.possible_targets.pop(0)  # pops the first target from possible targets
+            if board.coordsMatrix[target[0]][target[1]] in [0, 2]:  # check for valid hit
                 if board.coordsMatrix[target[0]][target[1]] == 2:  # indicates hit ship
-                    self.last_hit = target # sets last_hit to the target
-                    self.add_adjacent_targets(target) # adds the target to the adjacent targets
-                return target # returns coordinates of a ship to be hit
-        # once done with potential targets, fire randomly till ship is hit
-        target = self.aiEasyTurn(board) # fires randomly around the board
+                    self.last_hit = target  # sets last_hit to the target
+                    self.add_adjacent_targets(target)  # adds the target to the adjacent targets
+                return target  # returns coordinates of a ship to be hit
+        if self.last_hit: # if the last hit is valid continue shooting around it
+            row, col = self.last_hit
+            directions = [(row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)] # check all four orthogonal directions
+            for direction in directions:
+                if (0 <= direction[0] < 10) and (0 <= direction[1] < 10):
+                    if board.coordsMatrix[direction[0]][direction[1]] in [0, 2]:  # valid unhit space or ship
+                        # if it hits a ship, update last_hit and continue the process
+                        if board.coordsMatrix[direction[0]][direction[1]] == 2:
+                            self.last_hit = direction  # update last hit to the new target
+                            self.add_adjacent_targets(direction)  # update possible targets
+                        return direction  # return the valid hit target
+        target = self.aiEasyTurn(board) # fire randomly if no adjacent targets
         if board.coordsMatrix[target[0]][target[1]] == 2:  # indicates hit ship
-            self.last_hit = target # sets last_hit to the target
-            self.add_adjacent_targets(target) # adds the target to the adjacent targets
-        return target # returns coordinates of ship to be hit
+            self.last_hit = target  # sets last_hit to the target
+            self.add_adjacent_targets(target)  # adds the target to the adjacent targets
+        return target  # returns coordinates of a ship to be hit
 
     # input: None
     # output: returns the coordinates a ship to be hit
